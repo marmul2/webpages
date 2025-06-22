@@ -1,0 +1,518 @@
+<html lang="zh-CN"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>停电计划管理系统</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+  <!-- 引入腾讯地图SDK -->
+  <script src="https://map.qq.com/api/js?v=2.exp&key=YOUR_TENCENT_MAP_KEY"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#165DFF',
+            secondary: '#36CFC9',
+            warning: '#FF7D00',
+            danger: '#F53F3F',
+            success: '#00B42A',
+            dark: '#1D2129',
+            light: '#F2F3F5'
+          },
+          fontFamily: {
+            inter: ['Inter', 'system-ui', 'sans-serif'],
+          },
+        },
+      }
+    }
+  </script>
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .content-auto {
+        content-visibility: auto;
+      }
+      .scrollbar-hide {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+      .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+      }
+      .map-container {
+        height: calc(100vh - 64px);
+      }
+      .form-shadow {
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      }
+      .card-hover {
+        transition: all 0.3s ease;
+      }
+      .card-hover:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(22, 93, 255, 0.15);
+      }
+    }
+  </style>
+</head>
+<body class="font-inter bg-light text-dark antialiased">
+  <!-- 导航栏 -->
+  <nav class="bg-white shadow-md fixed top-0 left-0 right-0 z-50 transition-all duration-300" id="navbar">
+    <div class="container mx-auto px-4">
+      <div class="flex justify-between items-center h-16">
+        <div class="flex items-center">
+          <a href="#" class="flex items-center">
+            <i class="fa fa-bolt text-primary text-2xl mr-2"></i>
+            <span class="text-xl font-bold text-primary">停电计划管理系统</span>
+          </a>
+        </div>
+        <div class="hidden md:flex items-center space-x-4">
+          <a href="#dashboard" class="text-dark hover:text-primary transition-colors py-2 px-3 rounded-md">首页</a>
+          <a href="#plan" class="text-dark hover:text-primary transition-colors py-2 px-3 rounded-md">停电计划</a>
+          <a href="#approval" class="text-dark hover:text-primary transition-colors py-2 px-3 rounded-md">审批流程</a>
+          <a href="#map" class="text-dark hover:text-primary transition-colors py-2 px-3 rounded-md">地图可视化</a>
+        </div>
+        <div class="flex items-center">
+          <button class="bg-primary hover:bg-primary/90 text-white py-2 px-4 rounded-md transition-colors hidden md:block">
+            <i class="fa fa-plus mr-1"></i> 新建计划
+          </button>
+          <button class="md:hidden text-dark" id="mobile-menu-button">
+            <i class="fa fa-bars text-xl"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+    <!-- 移动端菜单 -->
+    <div class="md:hidden hidden bg-white shadow-lg absolute w-full" id="mobile-menu">
+      <div class="px-4 py-3 space-y-2">
+        <a href="#dashboard" class="block py-2 px-3 rounded-md hover:bg-light transition-colors">首页</a>
+        <a href="#plan" class="block py-2 px-3 rounded-md hover:bg-light transition-colors">停电计划</a>
+        <a href="#approval" class="block py-2 px-3 rounded-md hover:bg-light transition-colors">审批流程</a>
+        <a href="#map" class="block py-2 px-3 rounded-md hover:bg-light transition-colors">地图可视化</a>
+        <button class="w-full bg-primary hover:bg-primary/90 text-white py-2 px-4 rounded-md transition-colors mt-2">
+          <i class="fa fa-plus mr-1"></i> 新建计划
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 主内容区 -->
+  <main class="pt-16">
+    <!-- 仪表盘 -->
+    <section id="dashboard" class="py-8 px-4 bg-gradient-to-br from-primary/5 to-secondary/5">
+      <div class="container mx-auto">
+        <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold text-dark mb-6">停电计划管理仪表盘——汕头供电局</h2>
+        
+        <!-- 数据概览卡片 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div class="bg-white rounded-xl p-6 shadow-lg card-hover">
+            <div class="flex justify-between items-start">
+              <div>
+                <p class="text-gray-500 text-sm">本月计划数</p>
+                <h3 class="text-3xl font-bold mt-1 mb-2" id="plan-count">28</h3>
+                <p class="text-success text-sm"><i class="fa fa-arrow-up mr-1"></i> 较上月增长 12%</p>
+              </div>
+              <div class="bg-primary/10 p-3 rounded-lg">
+                <i class="fa fa-calendar text-primary text-xl"></i>
+              </div>
+            </div>
+          </div>
+          
+          <div class="bg-white rounded-xl p-6 shadow-lg card-hover">
+            <div class="flex justify-between items-start">
+              <div>
+                <p class="text-gray-500 text-sm">待审批数</p>
+                <h3 class="text-3xl font-bold mt-1 mb-2" id="pending-count">5</h3>
+                <p class="text-warning text-sm"><i class="fa fa-clock-o mr-1"></i> 需尽快处理</p>
+              </div>
+              <div class="bg-warning/10 p-3 rounded-lg">
+                <i class="fa fa-hourglass-half text-warning text-xl"></i>
+              </div>
+            </div>
+          </div>
+          
+          <div class="bg-white rounded-xl p-6 shadow-lg card-hover">
+            <div class="flex justify-between items-start">
+              <div>
+                <p class="text-gray-500 text-sm">已完成数</p>
+                <h3 class="text-3xl font-bold mt-1 mb-2" id="completed-count">21</h3>
+                <p class="text-success text-sm"><i class="fa fa-check-circle mr-1"></i> 按时完成率 95%</p>
+              </div>
+              <div class="bg-success/10 p-3 rounded-lg">
+                <i class="fa fa-check text-success text-xl"></i>
+              </div>
+            </div>
+          </div>
+          
+          <div class="bg-white rounded-xl p-6 shadow-lg card-hover">
+            <div class="flex justify-between items-start">
+              <div>
+                <p class="text-gray-500 text-sm">影响用户数</p>
+                <h3 class="text-3xl font-bold mt-1 mb-2" id="affected-users">12,548</h3>
+                <p class="text-danger text-sm"><i class="fa fa-exclamation-circle mr-1"></i> 需提前通知</p>
+              </div>
+              <div class="bg-danger/10 p-3 rounded-lg">
+                <i class="fa fa-users text-danger text-xl"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 趋势图表 -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          <div class="bg-white rounded-xl p-6 shadow-lg">
+            <h3 class="text-lg font-bold mb-4">月度停电计划统计</h3>
+            <div class="h-80">
+              <canvas id="plan-chart"></canvas>
+            </div>
+          </div>
+          
+          <div class="bg-white rounded-xl p-6 shadow-lg">
+            <h3 class="text-lg font-bold mb-4">审批状态分布</h3>
+            <div class="h-80">
+              <canvas id="approval-chart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 停电计划录入 -->
+    <section id="plan" class="py-12 px-4">
+      <div class="container mx-auto">
+        <div class="flex justify-between items-center mb-8">
+          <h2 class="text-[clamp(1.3rem,2.5vw,2rem)] font-bold text-dark">停电计划录入</h2>
+          <button id="new-plan-btn" class="bg-primary hover:bg-primary/90 text-white py-2 px-6 rounded-md transition-colors flex items-center">
+            <i class="fa fa-plus mr-2"></i> 新建计划
+          </button>
+        </div>
+        
+        <!-- 停电计划表单 (默认隐藏) -->
+        <div id="plan-form" class="bg-white rounded-xl p-6 shadow-lg form-shadow mb-8 hidden">
+          <h3 class="text-xl font-bold mb-6 pb-3 border-b">基本信息</h3>
+          
+          <form id="power-outage-form" class="space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label for="plan-name" class="block text-sm font-medium text-gray-700 mb-1">计划名称</label>
+                <input type="text" id="plan-name" name="plan-name" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors" placeholder="例如：XX线路检修停电计划" required="">
+              </div>
+              
+              <div>
+                <label for="voltage-level" class="block text-sm font-medium text-gray-700 mb-1">电压等级</label>
+                <select id="voltage-level" name="voltage-level" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors" required="">
+                  <option value="">请选择</option>
+                  <option value="10kV">10kV</option>
+                  <option value="35kV">35kV</option>
+                  <option value="110kV">110kV</option>
+                  <option value="220kV">220kV</option>
+                  <option value="500kV">500kV</option>
+                </select>
+              </div>
+              
+              <div>
+                <label for="start-time" class="block text-sm font-medium text-gray-700 mb-1">开始时间</label>
+                <input type="datetime-local" id="start-time" name="start-time" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors" required="">
+              </div>
+              
+              <div>
+                <label for="end-time" class="block text-sm font-medium text-gray-700 mb-1">结束时间</label>
+                <input type="datetime-local" id="end-time" name="end-time" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors" required="">
+              </div>
+              
+              <div>
+                <label for="outage-type" class="block text-sm font-medium text-gray-700 mb-1">停电类型</label>
+                <select id="outage-type" name="outage-type" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors" required="">
+                  <option value="">请选择</option>
+                  <option value="planned">计划检修</option>
+                  <option value="fault">故障抢修</option>
+                  <option value="emergency">紧急抢险</option>
+                  <option value="other">其他</option>
+                </select>
+              </div>
+              
+              <div>
+                <label for="responsible-person" class="block text-sm font-medium text-gray-700 mb-1">负责人</label>
+                <input type="text" id="responsible-person" name="responsible-person" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors" placeholder="负责人姓名" required="">
+              </div>
+            </div>
+            
+            <h3 class="text-xl font-bold mt-8 mb-6 pb-3 border-b">停电范围</h3>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div class="lg:col-span-2">
+                <label class="block text-sm font-medium text-gray-700 mb-1">停电区域地图</label>
+                <div id="map-container" class="w-full h-80 bg-gray-100 rounded-md border border-gray-300 relative">
+                  <div class="absolute inset-0 flex items-center justify-center">
+                    <p class="text-gray-500">地图加载中...</p>
+                  </div>
+                </div>
+                <div class="flex mt-2 space-x-2">
+                  <button type="button" id="draw-polygon-btn" class="bg-primary/10 text-primary px-3 py-1 rounded text-sm flex items-center">
+                    <i class="fa fa-pencil mr-1"></i> 绘制区域
+                  </button>
+                  <button type="button" id="clear-map-btn" class="bg-gray-200 text-gray-700 px-3 py-1 rounded text-sm flex items-center">
+                    <i class="fa fa-trash mr-1"></i> 清除
+                  </button>
+                  <span id="area-info" class="text-sm text-gray-600 ml-auto">已选择: 0个台区</span>
+                </div>
+              </div>
+              
+              <div>
+                <label for="affected-area" class="block text-sm font-medium text-gray-700 mb-1">影响区域描述</label>
+                <textarea id="affected-area" name="affected-area" rows="4" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors" placeholder="请描述停电影响的具体区域和范围" required=""></textarea>
+                
+                <label for="affected-users" class="block text-sm font-medium text-gray-700 mb-1 mt-4">预计影响用户数</label>
+                <input type="number" id="affected-users" name="affected-users" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors" placeholder="0" required="">
+                
+                <label for="reason" class="block text-sm font-medium text-gray-700 mb-1 mt-4">停电原因</label>
+                <textarea id="reason" name="reason" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors" placeholder="请详细说明停电原因" required=""></textarea>
+              </div>
+            </div>
+            
+            <h3 class="text-xl font-bold mt-8 mb-6 pb-3 border-b">附件上传</h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">停电通知文件</label>
+                <div class="flex items-center justify-center w-full">
+                  <label for="notice-file" class="flex flex-col items-center justify-center w-full h-40 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors">
+                    <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                      <i class="fa fa-cloud-upload text-3xl text-gray-400 mb-2"></i>
+                      <p class="mb-2 text-sm text-gray-500"><span class="font-semibold">点击上传</span> 或拖放文件</p>
+                      <p class="text-xs text-gray-500">支持 PDF, JPG, PNG 格式</p>
+                    </div>
+                    <input id="notice-file" type="file" class="hidden" accept=".pdf,.jpg,.jpeg,.png">
+                  </label>
+                </div>
+                <div id="notice-file-preview" class="mt-2 hidden">
+                  <div class="flex items-center p-2 bg-gray-50 rounded-md">
+                    <i class="fa fa-file-pdf-o text-danger mr-2"></i>
+                    <span id="notice-file-name" class="text-sm text-gray-700 truncate">filename.pdf</span>
+                    <button type="button" id="remove-notice-file" class="ml-auto text-gray-400 hover:text-danger">
+                      <i class="fa fa-times"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+              
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">现场勘查照片</label>
+                <div class="flex items-center justify-center w-full">
+                  <label for="survey-photos" class="flex flex-col items-center justify-center w-full h-40 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors">
+                    <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                      <i class="fa fa-camera text-3xl text-gray-400 mb-2"></i>
+                      <p class="mb-2 text-sm text-gray-500"><span class="font-semibold">点击上传</span> 或拖放照片</p>
+                      <p class="text-xs text-gray-500">支持 JPG, PNG 格式</p>
+                    </div>
+                    <input id="survey-photos" type="file" class="hidden" multiple="" accept=".jpg,.jpeg,.png">
+                  </label>
+                </div>
+                <div id="photo-preview-container" class="mt-2 grid grid-cols-3 gap-2 hidden">
+                  <!-- 照片预览将动态添加 -->
+                </div>
+              </div>
+            </div>
+            
+            <div class="flex justify-end space-x-4 pt-4 border-t">
+              <button type="button" id="cancel-plan-btn" class="px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors">取消</button>
+              <button type="button" id="save-draft-btn" class="px-6 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-800 transition-colors">保存草稿</button>
+              <button type="submit" class="px-6 py-2 bg-primary text-white rounded-md hover:bg-primary/90 transition-colors">提交审批</button>
+            </div>
+          </form>
+        </div>
+        
+        <!-- 停电计划列表 -->
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+          <div class="p-6 border-b">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <h3 class="text-lg font-bold">停电计划列表</h3>
+              
+              <div class="flex flex-col sm:flex-row gap-3">
+                <div class="relative">
+                  <input type="text" placeholder="搜索计划名称" class="pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors w-full sm:w-64">
+                  <i class="fa fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                </div>
+                
+                <div class="flex gap-2">
+                  <select class="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors">
+                    <option>全部状态</option>
+                    <option>待审批</option>
+                    <option>已通过</option>
+                    <option>已驳回</option>
+                    <option>已执行</option>
+                  </select>
+                  
+                  <select class="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors">
+                    <option>近7天</option>
+                    <option>近30天</option>
+                    <option>近90天</option>
+                    <option>全部时间</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">计划名称</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">电压等级</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">停电时间</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">负责人</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">状态</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200">
+                <tr class="hover:bg-gray-50 transition-colors">
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm font-medium text-gray-900">XX区10kV线路检修计划</div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm text-gray-900">10kV</div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm text-gray-900">2023-07-15 08:00 - 17:00</div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm text-gray-900">张三</div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">待审批</span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <button class="text-primary hover:text-primary/80 mr-3">查看</button>
+                    <button class="text-gray-600 hover:text-gray-900 mr-3">编辑</button>
+                    <button class="text-danger hover:text-danger/80">删除</button>
+                  </td>
+                </tr>
+                <tr class="hover:bg-gray-50 transition-colors">
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm font-medium text-gray-900">YY变电站35kV母线改造</div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm text-gray-900">35kV</div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm text-gray-900">2023-07-18 09:00 - 18:00</div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm text-gray-900">李四</div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">已通过</span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <button class="text-primary hover:text-primary/80 mr-3">查看</button>
+                    <button class="text-gray-600 hover:text-gray-900 mr-3">编辑</button>
+                    <button class="text-danger hover:text-danger/80">删除</button>
+                  </td>
+                </tr>
+                <tr class="hover:bg-gray-50 transition-colors">
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm font-medium text-gray-900">ZZ区110kV线路故障抢修</div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm text-gray-900">110kV</div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm text-gray-900">2023-07-10 14:30 - 22:00</div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm text-gray-900">王五</div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">已执行</span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <button class="text-primary hover:text-primary/80 mr-3">查看</button>
+                    <button class="text-gray-600 hover:text-gray-900 mr-3">编辑</button>
+                    <button class="text-danger hover:text-danger/80">删除</button>
+                  </td>
+                </tr>
+                <tr class="hover:bg-gray-50 transition-colors">
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm font-medium text-gray-900">AA区220kV线路年度检修</div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm text-gray-900">220kV</div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm text-gray-900">2023-07-22 07:00 - 19:00</div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm text-gray-900">赵六</div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">已驳回</span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <button class="text-primary hover:text-primary/80 mr-3">查看</button>
+                    <button class="text-gray-600 hover:text-gray-900 mr-3">编辑</button>
+                    <button class="text-danger hover:text-danger/80">删除</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          
+          <div class="px-6 py-4 bg-white border-t border-gray-200 flex items-center justify-between">
+            <div class="flex-1 flex justify-between sm:hidden">
+              <button class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                上一页
+              </button>
+              <button class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                下一页
+              </button>
+            </div>
+            <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+              <div>
+                <p class="text-sm text-gray-700">
+                  显示第 <span class="font-medium">1</span> 至 <span class="font-medium">4</span> 条，共 <span class="font-medium">28</span> 条记录
+                </p>
+              </div>
+              <div>
+                <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                  <button class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                    <span class="sr-only">上一页</span>
+                    <i class="fa fa-chevron-left"></i>
+                  </button>
+                  <button class="bg-primary text-white relative inline-flex items-center px-4 py-2 border border-primary text-sm font-medium">
+                    1
+                  </button>
+                  <button class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium">
+                    2
+                  </button>
+                  <button class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium">
+                    3
+                  </button>
+                  <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700">
+                    ...
+                  </span>
+                  <button class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium">
+                    7
+                  </button>
+                  <button class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                    <span class="sr-only">下一页</span>
+                    <i class="fa fa-chevron-right"></i>
+                  </button>
+                </nav>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 审批流程 -->
+    <section id="approval" class="py-12 px-4 bg-gradient-to-br from-primary/5 to-secondary/5">
+      <div class="container mx-auto">
+        <h2 class="text-[clamp(1.3rem,2.5vw,2rem)] font-bold text-dark mb-8">审批流程管理</h2>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <!-- 审批流程图表 -->
+          <div class="lg:col-span-1">
+            

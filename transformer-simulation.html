@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>变压器原理示意程序——汕头供电局人工智能学习班</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#165DFF',
+                        secondary: '#36D399',
+                        accent: '#FF9F43',
+                        dark: '#1E293B',
+                        light: '#F8FAFC'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .coil {
+                stroke-dasharray: 10;
+                animation: move 1s linear infinite;
+            }
+            .magnetic-field {
+                opacity: 0.3;
+                animation: pulse 2s ease-in-out infinite;
+            }
+            .arrow {
+                animation: flow 1s ease-in-out infinite;
+            }
+            .param-control {
+                @apply transition-all duration-300;
+            }
+            .param-control:hover {
+                @apply shadow-md -translate-y-0.5;
+            }
+        }
+        
+        @keyframes move {
+            to {
+                stroke-dashoffset: -20;
+            }
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 0.3;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.6;
+                transform: scale(1.05);
+            }
+        }
+        
+        @keyframes flow {
+            0%, 100% {
+                opacity: 0.7;
+            }
+            50% {
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans">
+    <!-- 导航栏 -->
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <span class="text-primary font-bold text-xl">变压器原理示意程序——汕头供电局人工智能学习班</span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button id="resetBtn" class="px-3 py-1.5 bg-gray-100 rounded-lg text-gray-700 hover:bg-gray-200 transition-colors">
+                        <i class="fa fa-refresh mr-1"></i>重置
+                    </button>
+                    <button id="playPauseBtn" class="px-3 py-1.5 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">
+                        <i class="fa fa-play mr-1"></i>播放
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主内容 -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- 左侧参数设置 -->
+            <div class="lg:col-span-1">
+                <div class="bg-white rounded-xl shadow p-6 sticky top-24">
+                    <h2 class="text-xl font-bold text-dark mb-6 flex items-center">
+                        <i class="fa fa-sliders text-primary mr-2"></i>参数设置
+                    </h2>
+                    
+                    <div class="space-y-6">
+                        <!-- 输入电压 -->
+                        <div>
+                            <label for="inputVoltage" class="block text-sm font-medium text-gray-700 mb-2">输入电压 (V)</label>
+                            <div class="flex items-center">
+                                <input type="range" id="inputVoltage" min="10" max="220" value="110" 
+                                    class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer param-control">
+                                <span id="inputVoltageValue" class="ml-3 min-w-[4rem] text-right font-medium">110 V</span>
+                            </div>
+                        </div>
+                        
+                        <!-- 原线圈匝数 -->
+                        <div>
+                            <label for="primaryTurns" class="block text-sm font-medium text-gray-700 mb-2">原线圈匝数</label>
+                            <div class="flex items-center">
+                                <input type="range" id="primaryTurns" min="10" max="100" value="50" step="5" 
+                                    class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer param-control">
+                                <span id="primaryTurnsValue" class="ml-3 min-w-[4rem] text-right font-medium">50</span>
+                            </div>
+                        </div>
+                        
+                        <!-- 副线圈匝数 -->
+                        <div>
+                            <label for="secondaryTurns" class="block text-sm font-medium text-gray-700 mb-2">副线圈匝数</label>
+                            <div class="flex items-center">
+                                <input type="range" id="secondaryTurns" min="10" max="100" value="100" step="5" 
+                                    class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer param-control">
+                                <span id="secondaryTurnsValue" class="ml-3 min-w-[4rem] text-right font-medium">100</span>
+                            </div>
+                        </div>
+                        
+                        <!-- 频率 -->
+                        <div>
+                            <label for="frequency" class="block text-sm font-medium text-gray-700 mb-2">频率 (Hz)</label>
+                            <div class="flex items-center">
+                                <input type="range" id="frequency" min="1" max="100" value="50" 
+                                    class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer param-control">
+                                <span id="frequencyValue" class="ml-3 min-w-[4rem] text-right font-medium">50 Hz</span>
+                            </div>
+                        </div>
+                        
+                        <!-- 铁芯材料 -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">铁芯材料</label>
+                            <div class="grid grid-cols-2 gap-3">
+                                <button class="core-material-btn bg-primary text-white py-2 px-4 rounded-lg transition-colors" data-material="silicon-steel">硅钢</button>
+                                <button class="core-material-btn bg-gray-100 text-gray-700 py-2 px-4 rounded-lg transition-colors" data-material="iron">铁</button>
+                                <button class="core-material-btn bg-gray-100 text-gray-700 py-2 px-4 rounded-lg transition-colors" data-material="ferrite">铁氧体</button>
+                                <button class="core-material-btn bg-gray-100 text-gray-700 py-2 px-4 rounded-lg transition-colors" data-material="air">空气</button>
+                            </div>
+                        </div>
+                        
+                        <!-- 负载电阻 -->
+                        <div>
+                            <label for="loadResistance" class="block text-sm font-medium text-gray-700 mb-2">负载电阻 (Ω)</label>
+                            <div class="flex items-center">
+                                <input type="range" id="loadResistance" min="1" max="100" value="50" 
+                                    class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer param-control">
+                                <span id="loadResistanceValue" class="ml-3 min-w-[4rem] text-right font-medium">50 Ω</span>
+                            </div>
+                        </div>
+                        
+                        <!-- 显示选项 -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">显示选项</label>
+                            <div class="space-y-2">
+                                <label class="flex items-center">
+                                    <input type="checkbox" id="showMagneticField" checked class="w-4 h-4 text-primary rounded border-gray-300 focus:ring-primary">
+                                    <span class="ml-2 text-sm text-gray-700">显示磁场</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" id="showCurrent" checked class="w-4 h-4 text-primary rounded border-gray-300 focus:ring-primary">
+                                    <span class="ml-2 text-sm text-gray-700">显示电流</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" id="showVoltage" checked class="w-4 h-4 text-primary rounded border-gray-300 focus:ring-primary">
+                                    <span class="ml-2 text-sm text-gray-700">显示电压值</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-8">
+                        <h3 class="text-lg font-semibold mb-3">计算结果</h3>
+                        <div class="bg-gray-50 rounded-lg p-4 space-y-2">
+                            <div class="flex justify-between">
+                                <span class="text-sm text-gray-600">输出电压:</span>
+                                <span id="outputVoltage" class="font-medium">220.0 V</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-sm text-gray-600">变压比:</span>
+                                <span id="transformerRatio" class="font-medium">1:2</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-sm text-gray-600">理论效率:</span>
+                                <span id="efficiency" class="font-medium">95.0%</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-sm text-gray-600">输入功率:</span>
+                                <span id="inputPower" class="font-medium">242.0 W</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-sm text-gray-600">输出功率:</span>
+                                <span id="outputPower" class="font-medium">230.0 W</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 右侧动画 -->
+            <div class="lg:col-span-2">
+                <div class="bg-white rounded-xl shadow p-6">
+                    <h2 class="text-xl font-bold text-dark mb-6 flex items-center">
+                        <i class="fa fa-play-circle text-primary mr-2"></i>变压器工作原理动画
+                    </h2>
+                    
+                    <div class="relative bg-gray-50 rounded-lg overflow-hidden" style="height: 600px;">
+                        <svg id="transformerAnimation" width="100%" height="100%" viewBox="0 0 800 600">
+                            <!-- 背景网格 -->
+                            <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+                                <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#f0f0f0" stroke-width="0.5"/>
+                            </pattern>
+                            <rect width="100%" height="100%" fill="url(#grid)"/>
+                            
+                            <!-- 变压器铁芯 -->
+                            <rect id="core" x="300" y="200" width="200" height="200" rx="5" fill="#E2E8F0" stroke="#94A3B8" stroke-width="2"/>
+                            <rect x="350" y="150" width="100" height="300" rx="5" fill="#E2E8F0" stroke="#94A3B8" stroke-width="2"/>
+                            
+                            <!-- 原线圈 -->
+                            <g id="primaryCoil">
+                                <path d="M 150 250 C 180 250, 200 230, 220 230 C 240 230, 250 250, 280 250" class="coil" stroke="#165DFF" stroke-width="3" fill="none"/>
+                                <path d="M 150 280 C 180 280, 200 260, 220 260 C 240 260, 250 280, 280 280" class="coil" stroke="#165DFF" stroke-width="3" fill="none"/>
+                                <path d="M 150 310 C 180 310, 200 290, 220 290 C 240 290, 250 310, 280 310" class="coil" stroke="#165DFF" stroke-width="3" fill="none"/>
+                                <path d="M 150 340 C 180 340, 200 320, 220 320 C 240 320, 250 340, 280 340" class="coil" stroke="#165DFF" stroke-width="3" fill="none"/>
+                                <path d="M 150 370 C 180 370, 200 350, 220 350 C 240 350, 250 370, 280 370" class="coil" stroke="#165DFF" stroke-width="3" fill="none"/>
+                                
+                                <!-- 原线圈电流指示 -->
+                                <g id="primaryCurrent">
+                                    <path d="M 200 260 L 210 260" class="arrow" stroke="#165DFF" stroke-width="2" stroke-linecap="round"/>
+                                    <path d="M 207 257 L 210 260 L 207 263" class="arrow" fill="#165DFF"/>
+                                    
+                                    <path d="M 230 290 L 240 290" class="arrow" stroke="#165DFF" stroke-width="2" stroke-linecap="round"/>
+                                    <path d="M 237 287 L 240 290 L 237 293" class="arrow" fill="#165DFF"/>
+                                    
+                                    <path d="M 200 320 L 210 320" class="arrow" stroke="#165DFF" stroke-width="2" stroke-linecap="round"/>
+                                    <path d="M 207 317 L 210 320 L 207 323" class="arrow" fill="#165DFF"/>
+                                    
+                                    <path d="M 230 350 L 240 350" class="arrow" stroke="#165DFF" stroke-width="2" stroke-linecap="round"/>
+                                    <path d="M 237 347 L 240 350 L 237 353" class="arrow" fill="#165DFF"/>
+                                </g>
+                            </g>
+                            
+                            <!-- 副线圈 -->
+                            <g id="secondaryCoil">
+                                <path d="M 520 250 C 550 250, 570 230, 600 230 C 630 230, 650 250, 680 250" class="coil" stroke="#FF9F43" stroke-width="3" fill="none"/>
+                                <path d="M 520 280 C 550 280, 570 260, 600 260 C 630 260, 650 280, 680 280" class="coil" stroke="#FF9F43" stroke-width="3" fill="none"/>
+                                <path d="M 520 310 C 550 310, 570 290, 600 290 C 630 290, 650 310, 680 310" class="coil" stroke="#FF9F43" stroke-width="3" fill="none"/>
+                                <path d="M 520 340 C 550 340, 570 320, 600 320 C 630 320, 650 340, 680 340" class="coil" stroke="#FF9F43" stroke-width="3" fill="none"/>
+                                <path d="M 520 370 C 550 370, 570 350, 600 350 C 630 350, 650 370, 680 370" class="coil" stroke="#FF9F43" stroke-width="3" fill="none"/>
+                                <path d="M 520 400 C 550 400, 570 380, 600 380 C 630 380, 650 400, 680 400" class="coil" stroke="#FF9F43" stroke-width="3" fill="none"/>
+                                <path d="M 520 430 C 550 430, 570 410, 600 410 C 630 410, 650 430, 680 430" class="coil" stroke="#FF9F43" stroke-width="3" fill="none"/>
+                                <path d="M 520 460 C 550 460, 570 440, 600 440 C 630 440, 650 460, 680 460" class="coil" stroke="#FF9F43" stroke-width="3" fill="none"/>
+                                
+                                <!-- 副线圈电流指示 -->
+                                <g id="secondaryCurrent">
+                                    <path d="M 570 260 L 580 260" class="arrow" stroke="#FF9F43" stroke-width="2" stroke-linecap="round"/>
+                                    <path d="M 577 257 L 580 260 L 577 263" class="arrow" fill="#FF9F43"/>
+                                    
+                                    <path d="M 600 290 L 610 290" class="arrow" stroke="#FF9F43" stroke-width="2" stroke-linecap="round"/>
+                                    <path d="M 607 287 L 610 290 L 607 293" class="arrow" fill="#FF9F43"/>
+                                    
+                                    <path d="M 570 320 L 580 320" class="arrow" stroke="#FF9F43" stroke-width="2" stroke-linecap="round"/>
+                                    <path d="M 577 317 L 580 320 L 577 323" class="arrow" fill="#FF9F43"/>
+                                    
+                                    <path d="M 600 350 L 610 350" class="arrow" stroke="#FF9F43" stroke-width="2" stroke-linecap="round"/>
+                                    <path d="M 607 347 L 610 350 L 607 353" class="arrow" fill="#FF9F43"/>
+                                    
+                                    <path d="M 570 380 L 580 380" class="arrow" stroke="#FF9F43" stroke-width="2" stroke-linecap="round"/>
+                                    <path d="M 577 377 L 580 380 L 577 383" class="arrow" fill="#FF9F43"/>
+                                    
+                                    <path d="M 600 410 L 610 410" class="arrow" stroke="#FF9F43" stroke-width="2" stroke-linecap="round"/>
+                                    <path d="M 607 407 L 610 410 L 607 413" class="arrow" fill="#FF9F43"/>
+                                    
+                                    <path d="M 570 440 L 580 440" class="arrow" stroke="#FF9F43" stroke-width="2" stroke-linecap="round"/>
+                                    <path d="M 577 437 L 580 440 L 577 443" class="arrow" fill="#FF9F43"/>
+                                </g>
+                            </g>
+                            
+                            <!-- 磁场 -->
+                            <g id="magneticField">
+                                <circle cx="400" cy="250" r="100" class="magnetic-field" stroke="#36D399" stroke-width="2" fill="none"/>
+                                <circle cx="400" cy="250" r="70" class="magnetic-field" stroke="#36D399" stroke-width="2" fill="none"/>
+                                <circle cx="400" cy="250" r="40" class="magnetic-field" stroke="#36D399" stroke-width="2" fill="none"/>
+                                
+                                <!-- 磁场方向指示 -->
+                                <g id="fieldDirection">
+                                    <path d="M 480 250 L 490 250" class="arrow" stroke="#36D399" stroke-width="2" stroke-linecap="round"/>
+                                    <path d="M 487 247 L 490 250 L 487 253" class="arrow" fill="#36D399"/>
+                                    
+                                    <path d="M 310 250 L 320 250" class="arrow" stroke="#36D399" stroke-width="2" stroke-linecap="round"/>
+                                    <path d="M 317 247 L 320 250 L 317 253" class="arrow" fill="#36D399"/>
+                                </g>
+                            </g>
+                            
+                            <!-- 电源 -->
+                            <g id="powerSource">
+                                <rect x="100" y="250" width="40" height="120" rx="5" fill="#165DFF" stroke="#0F4CD6" stroke-width="2"/>
+                                <text x="120" y="310" text-anchor="middle" fill="white" font-size="16" font-weight="bold">AC</text>
+                                
+                                <!-- 电压指示 -->
+                                <g id="voltageIndicator">
+                                    <text id="inputVoltageText" x="70" y="310" fill="#165DFF" font-size="16" font-weight="bold">110V</text>
+                                    <circle cx="70" cy="290" r="5" fill="#165DFF"/>
+                                    <circle cx="70" cy="330" r="5" fill="#165DFF"/>
+                                    <path d="M 70 295 L 70 325" stroke="#165DFF" stroke-width="2"/>
+                                    <path d="M 65 305 L 75 305" stroke="#165DFF" stroke-width="2"/>
+                                    <path d="M 65 315 L 75 315" stroke="#165DFF" stroke-width="2"/>
+                                </g>
+                                
+                                <!-- 连接线 -->
+                                <path d="M 140 310 L 150 310" stroke="#165DFF" stroke-width="3"/>
+                                <path d="M 140 310 L 140 370 L 150 370" stroke="#165DFF" stroke-width="3"/>
+                            </g>
+                            
+                            <!-- 负载 -->
+                            <g id="load">
+                                <rect x="700" y="250" width="40" height="120" rx="5" fill="#FF9F43" stroke="#E68A2E" stroke-width="2"/>
+                                <text x="720" y="310" text-anchor="middle" fill="white" font-size="14">负载</text>
+                                
+                                <!-- 电压指示 -->
+                                <g id="outputVoltageIndicator">
+                                    <text id="outputVoltageText" x="770" y="310" fill="#FF9F43" font-size="16" font-weight="bold">220V</text>
+                                    <circle cx="770" cy="290" r="5" fill="#FF9F43"/>
+                                    <circle cx="770" cy="330" r="5" fill="#FF9F43"/>
+                                    <path d="M 770 295 L 770 325" stroke="#FF9F43" stroke-width="2"/>
+                                    <path d="M 765 305 L 775 305" stroke="#FF9F43" stroke-width="2"/>
+                                    <path d="M 765 315 L 775 315" stroke="#FF9F43" stroke-width="2"/>
+                                </g>
+                                
+                                <!-- 连接线 -->
+                                <path d="M 700 310 L 680 310" stroke="#FF9F43" stroke-width="3"/>
+                                <path d="M 700 370 L 680 370 L 680 310" stroke="#FF9F43" stroke-width="3"/>
+                            </g>
+                            
+                            <!-- 波形图 -->
+                            <g id="waveform" transform="translate(200, 500)">
+                                <rect x="0" y="0" width="400" height="80" rx="5" fill="white" stroke="#E2E8F0" stroke-width="1"/>
+                                <text x="200" y="-10" text-anchor="middle" fill="#64748B" font-size="14">电压波形</text>
+                                
+                                <!-- X轴 -->
+                                <path d="M 0 40 L 400 40" stroke="#94A3B8" stroke-width="1"/>
+                                
+                                <!-- Y轴 -->
+                                <path d="M 0 0 L 0 80" stroke="#94A3B8" stroke-width="1"/>
+                                
+                                <!-- 输入电压波形 -->
+                                <path id="inputWaveform" d="" stroke="#165DFF" stroke-width="2" fill="none"/>
+                                
+                                <!-- 输出电压波形 -->
+                                <path id="outputWaveform" d="" stroke="#FF9F43" stroke-width="2" fill="none"/>
+                                
+                                <!-- 图例 -->
+                                <text x="50" y="20" fill="#165DFF" font-size="12">输入电压</text>
+                                <text x="250" y="20" fill="#FF9F43" font-size="12">输出电压</text>
+                                <path d="M 30 20 L 45 20" stroke="#165DFF" stroke-width="2"/>
+                                <path d="M 230 20 L 245 20" stroke="#FF9F43" stroke-width="2"/>
+                            </g>
+                        </svg>
+                    </div>
+                    
+                    <div class="mt-6">
+                        <h3 class="text-lg font-semibold mb-3">变压器工作原理</h3>
+                        <div class="prose max-w-none">
+                            <p>变压器是利用电磁感应原理改变交流电压的装置，主要构件是初级线圈、次级线圈和铁芯。</p>
+                            <p>当原线圈（初级线圈）中有交流电通过时，会在铁芯中产生交变磁场。这个交变磁场会在副线圈（次级线圈）中感应出电动势，从而产生电流。</p>
+                            <p>变压器的电压比等于原、副线圈的匝数比：</p>
+                            <p class="text-center text-lg font-medium">V₁/V₂ = N₁/N₂</p>
+                            <p>其中，V₁和V₂分别是原、副线圈的电压，N₁和N₂分别是原、副线圈的匝数。</p>
+                            <p>在理想情况下，变压器的输入功率等于输出功率：</p>
+                            <p class="text-center text-lg font-medium">P₁ = P₂ → V₁×I₁ = V₂×I₂</p>
+                            <p>因此，电流比与匝数比成反比：</p>
+                            <p class="text-center text-lg font-medium">I₁/I₂ = N₂/N₁</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-dark text-white py-8 mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <p>&copy; 2025 变压器原理示意程序 | 由能源集团新能源业务部开发</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 获取DOM元素
+            const inputVoltageSlider = document.getElementById('inputVoltage');
+            const inputVoltageValue = document.getElementById('inputVoltageValue');
+            const primaryTurnsSlider = document.getElementById('primaryTurns');
+            const primaryTurnsValue = document.getElementById('primaryTurnsValue');
+            const secondaryTurnsSlider = document.getElementById('secondaryTurns');
+            const secondaryTurnsValue = document.getElementById('secondaryTurnsValue');
+            const frequencySlider = document.getElementById('frequency');
+            const frequencyValue = document.getElementById('frequencyValue');
+            const loadResistanceSlider = document.getElementById('loadResistance');
+            const loadResistanceValue = document.getElementById('loadResistanceValue');
+            const coreMaterialBtns = document.querySelectorAll('.core-material-btn');
+            const showMagneticFieldCheckbox = document.getElementById('showMagneticField');
+            const showCurrentCheckbox = document.getElementById('showCurrent');
+            const showVoltageCheckbox = document.getElementById('showVoltage');
+            const resetBtn = document.getElementById('resetBtn');
+            const playPauseBtn = document.getElementById('playPauseBtn');
+            const outputVoltage = document.getElementById('outputVoltage');
+            const transformerRatio = document.getElementById('transformerRatio');
+            const efficiency = document.getElementById('efficiency');
+            const inputPower = document.getElementById('inputPower');
+            const outputPower = document.getElementById('outputPower');
+            const inputVoltageText = document.getElementById('inputVoltageText');
+            const outputVoltageText = document.getElementById('outputVoltageText');
+            const magneticField = document.getElementById('magneticField');
+            const primaryCurrent = document.getElementById('primaryCurrent');
+            const secondaryCurrent = document.getElementById('secondaryCurrent');
+            const inputWaveform = document.getElementById('inputWaveform');
+            const outputWaveform = document.getElementById('outputWaveform');
+            
+            // 变压器参数
+            let params = {
+                inputVoltage: 110,
+                primaryTurns: 50,
+                secondaryTurns: 100,
+                frequency: 50,
+                loadResistance: 50,
+                coreMaterial: 'silicon-steel',
+                isPlaying: true,
+                showMagneticField: true,
+                showCurrent: true,
+                showVoltage: true
+            };
+            
+            // 材料特性
+            const coreMaterials = {
+                'silicon-steel': { efficiency: 0.95, color: '#E2E8F0' },
+                'iron': { efficiency: 0.90, color: '#F87171' },
+                'ferrite': { efficiency: 0.85, color: '#A78BFA' },
+                'air': { efficiency: 0.70, color: '#BAE6FD' }
+            };
+            
+            // 更新显示的参数值
+            function updateDisplayValues() {
+                inputVoltageValue.textContent = `${params.inputVoltage} V`;
+                primaryTurnsValue.textContent = params.primaryTurns;
+                secondaryTurnsValue.textContent = params.secondaryTurns;
+                frequencyValue.textContent = `${params.frequency} Hz`;
+                loadResistanceValue.textContent = `${params.loadResistance} Ω`;
+                
+                // 计算输出电压
+                const outputVoltageValue = (params.inputVoltage * params.secondaryTurns / params.primaryTurns).toFixed(1);
+                outputVoltage.textContent = `${outputVoltageValue} V`;
+                
+                // 计算变压比
+                const gcd = (a, b) => b === 0 ? a : gcd(b, a % b);
+                const divisor = gcd(params.primaryTurns, params.secondaryTurns);
+                const ratio1 = params.primaryTurns / divisor;
+                const ratio2 = params.secondaryTurns / divisor;
+                transformerRatio.textContent = `${ratio1}:${ratio2}`;
+                
+                // 计算效率
+                const materialEfficiency = coreMaterials[params.coreMaterial].efficiency * 100;
+                efficiency.textContent = `${materialEfficiency.toFixed(1)}%`;
+                
+                // 计算功率
+                const inputCurrent = params.inputVoltage / params.loadResistance;
+                const inputPowerValue = (params.inputVoltage * inputCurrent).toFixed(1);
+                inputPower.textContent = `${inputPowerValue} W`;
+                
+                const outputPowerValue = (inputPowerValue * materialEfficiency / 100).toFixed(1);
+                outputPower.textContent = `${outputPowerValue} W`;
+                
+                // 更新电压显示
+                if (params.showVoltage) {
+                    inputVoltageText.textContent = `${params.inputVoltage}V`;
+                    outputVoltageText.textContent = `${outputVoltageValue}V`;
+                }
+                
+                // 更新波形
+                updateWaveforms();
+            }
+            
+            // 更新铁芯颜色
+            function updateCoreColor() {
+                const coreElements = document.querySelectorAll('#core, #core rect');
+                const color = coreMaterials[params.coreMaterial].color;
+                coreElements.forEach(el => {
+                    el.setAttribute('fill', color);
+                });
+            }
+            
+            // 更新波形
+            function updateWaveforms() {
+                const amplitude1 = params.inputVoltage / 5;
+                const amplitude2 = (params.inputVoltage * params.secondaryTurns / params.primaryTurns) / 5;
+                const points1 = [];
+                const points2 = [];
+                
+                for (let x = 0; x <= 400; x += 1) {
+                    const y1 = 40 - amplitude1 * Math.sin(x * 0.05);
+                    const y2 = 40 - amplitude2 * Math.sin(x * 0.05);
+                    points1.push(`${x},${y1}`);
+                    points2.push(`${x},${y2}`);
+                }
+                
+                inputWaveform.setAttribute('d', `M ${points1.join(' L ')}`);
+                outputWaveform.setAttribute('d', `M ${points2.join(' L ')}`);
+            }
+            
+            // 控制动画
+            function controlAnimation() {
+                const coils = document.querySelectorAll('.coil');
+                const arrows = document.querySelectorAll('.arrow');
+                const fieldDirection = document.getElementById('fieldDirection');
+                
+                if (params.isPlaying) {
+                    // 恢复动画
+                    coils.forEach(coil => {
+                        coil.style.animationPlayState = 'running';
+                    });
+                    arrows.forEach(arrow => {
+                        arrow.style.animationPlayState = 'running';
+                    });
+                    fieldDirection.style.animationPlayState = 'running';
+                    
+                    // 调整动画速度
+                    const speedFactor = params.frequency / 50;
+                    coils.forEach(coil => {
+                        coil.style.animationDuration = `${1 / speedFactor}s`;
+                    });
+                    arrows.forEach(arrow => {
+                        arrow.style.animationDuration = `${1 / speedFactor}s`;
+                    });
+                    fieldDirection.style.animationDuration = `${1 / speedFactor}s`;
+                } else {
+                    // 暂停动画
+                    coils.forEach(coil => {
+                        coil.style.animationPlayState = 'paused';
+                    });
+                    arrows.forEach(arrow => {
+                        arrow.style.animationPlayState = 'paused';
+                    });
+                    fieldDirection.style.animationPlayState = 'paused';
+                }
+                
+                // 显示/隐藏磁场
+                magneticField.style.display = params.showMagneticField ? 'block' : 'none';
+                
+                // 显示/隐藏电流
+                primaryCurrent.style.display = params.showCurrent ? 'block' : 'none';
+                secondaryCurrent.style.display = params.showCurrent ? 'block' : 'none';
+                
+                // 显示/隐藏电压
+                document.getElementById('voltageIndicator').style.display = params.showVoltage ? 'block' : 'none';
+                document.getElementById('outputVoltageIndicator').style.display = params.showVoltage ? 'block' : 'none';
+            }
+            
+            // 重置参数
+            function resetParams() {
+                inputVoltageSlider.value = 110;
+                primaryTurnsSlider.value = 50;
+                secondaryTurnsSlider.value = 100;
+                frequencySlider.value = 50;
+                loadResistanceSlider.value = 50;
+                coreMaterialBtns[0].click();
+                showMagneticFieldCheckbox.checked = true;
+                showCurrentCheckbox.checked = true;
+                showVoltageCheckbox.checked = true;
+                
+                params = {
+                    inputVoltage: 110,
+                    primaryTurns: 50,
+                    secondaryTurns: 100,
+                    frequency: 50,
+                    loadResistance: 50,
+                    coreMaterial: 'silicon-steel',
+                    isPlaying: true,
+                    showMagneticField: true,
+                    showCurrent: true,
+                    showVoltage: true
+                };
+                
+                updateDisplayValues();
+                updateCoreColor();
+                controlAnimation();
+                playPauseBtn.innerHTML = '<i class="fa fa-pause mr-1"></i>暂停';
+            }
+            
+            // 事件监听器
+            inputVoltageSlider.addEventListener('input', function() {
+                params.inputVoltage = parseInt(this.value);
+                updateDisplayValues();
+            });
+            
+            primaryTurnsSlider.addEventListener('input', function() {
+                params.primaryTurns = parseInt(this.value);
+                updateDisplayValues();
+            });
+            
+            secondaryTurnsSlider.addEventListener('input', function() {
+                params.secondaryTurns = parseInt(this.value);
+                updateDisplayValues();
+            });
+            
+            frequencySlider.addEventListener('input', function() {
+                params.frequency = parseInt(this.value);
+                updateDisplayValues();
+                controlAnimation();
+            });
+            
+            loadResistanceSlider.addEventListener('input', function() {
+                params.loadResistance = parseInt(this.value);
+                updateDisplayValues();
+            });
+            
+            coreMaterialBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    coreMaterialBtns.forEach(b => {
+                        b.classList.remove('bg-primary', 'text-white');
+                        b.classList.add('bg-gray-100', 'text-gray-700');
+                    });
+                    
+                    this.classList.remove('bg-gray-100', 'text-gray-700');
+                    this.classList.add('bg-primary', 'text-white');
+                    
+                    params.coreMaterial = this.dataset.material;
+                    updateDisplayValues();
+                    updateCoreColor();
+                });
+            });
+            
+            showMagneticFieldCheckbox.addEventListener('change', function() {
+                params.showMagneticField = this.checked;
+                controlAnimation();
+            });
+            
+            showCurrentCheckbox.addEventListener('change', function() {
+                params.showCurrent = this.checked;
+                controlAnimation();
+            });
+            
+            showVoltageCheckbox.addEventListener('change', function() {
+                params.showVoltage = this.checked;
+                controlAnimation();
+            });
+            
+            resetBtn.addEventListener('click', resetParams);
+            
+            playPauseBtn.addEventListener('click', function() {
+                params.isPlaying = !params.isPlaying;
+                this.innerHTML = params.isPlaying ? '<i class="fa fa-pause mr-1"></i>暂停' : '<i class="fa fa-play mr-1"></i>播放';
+                controlAnimation();
+            });
+            
+            // 初始化
+            updateDisplayValues();
+            updateCoreColor();
+            updateWaveforms();
+            controlAnimation();
+        });
+    </script>
+</body>
+</html>
+    

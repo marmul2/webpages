@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>发电机原理动画展示</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#10B981',
+                        accent: '#F59E0B',
+                        dark: '#1F2937',
+                        light: '#F3F4F6'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .generator-shadow {
+                box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.2);
+            }
+            .parameter-panel {
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <div class="container mx-auto px-4 py-8 max-w-7xl">
+        <header class="mb-8 text-center">
+            <h1 class="text-[clamp(1.8rem,3vw,2.5rem)] font-bold text-dark">发电机原理动画演示</h1>
+            <p class="text-gray-600 mt-2 max-w-3xl mx-auto">通过调整参数，直观了解发电机的工作原理和电磁感应现象</p>
+        </header>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- 左侧参数控制面板 -->
+            <div class="lg:col-span-1 bg-white rounded-xl p-6 parameter-panel transition-all duration-300 hover:shadow-lg">
+                <h2 class="text-xl font-semibold text-dark mb-4 flex items-center">
+                    <i class="fa fa-sliders text-primary mr-2"></i>参数控制
+                </h2>
+                
+                <div class="space-y-6">
+                    <!-- 磁场强度控制 -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">磁场强度</label>
+                        <div class="flex items-center">
+                            <i class="fa fa-magnet text-primary mr-3"></i>
+                            <input type="range" id="magneticField" min="1" max="10" value="5" 
+                                class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-primary">
+                            <span id="magneticFieldValue" class="ml-3 text-sm font-medium text-primary min-w-[2rem] text-center">5</span>
+                        </div>
+                        <div class="flex justify-between text-xs text-gray-500 mt-1">
+                            <span>弱</span>
+                            <span>强</span>
+                        </div>
+                    </div>
+                    
+                    <!-- 旋转速度控制 -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">旋转速度</label>
+                        <div class="flex items-center">
+                            <i class="fa fa-tachometer text-secondary mr-3"></i>
+                            <input type="range" id="rotationSpeed" min="1" max="10" value="3" 
+                                class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-secondary">
+                            <span id="rotationSpeedValue" class="ml-3 text-sm font-medium text-secondary min-w-[2rem] text-center">3</span>
+                        </div>
+                        <div class="flex justify-between text-xs text-gray-500 mt-1">
+                            <span>慢</span>
+                            <span>快</span>
+                        </div>
+                    </div>
+                    
+                    <!-- 线圈匝数控制 -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">线圈匝数</label>
+                        <div class="flex items-center">
+                            <i class="fa fa-coil text-accent mr-3"></i>
+                            <input type="range" id="coilTurns" min="1" max="20" value="10" 
+                                class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-accent">
+                            <span id="coilTurnsValue" class="ml-3 text-sm font-medium text-accent min-w-[2rem] text-center">10</span>
+                        </div>
+                        <div class="flex justify-between text-xs text-gray-500 mt-1">
+                            <span>少</span>
+                            <span>多</span>
+                        </div>
+                    </div>
+                    
+                    <!-- 负载电阻控制 -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">负载电阻</label>
+                        <div class="flex items-center">
+                            <i class="fa fa-resistance text-purple-500 mr-3"></i>
+                            <input type="range" id="loadResistance" min="1" max="20" value="10" 
+                                class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-purple-500">
+                            <span id="loadResistanceValue" class="ml-3 text-sm font-medium text-purple-500 min-w-[2rem] text-center">10</span>
+                        </div>
+                        <div class="flex justify-between text-xs text-gray-500 mt-1">
+                            <span>小</span>
+                            <span>大</span>
+                        </div>
+                    </div>
+                    
+                    <!-- 发电机类型选择 -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">发电机类型</label>
+                        <div class="grid grid-cols-2 gap-3">
+                            <button id="dcGenerator" class="py-2 px-4 bg-primary text-white rounded-lg text-sm font-medium transition-all duration-200 hover:bg-primary/90 focus:ring-2 focus:ring-primary/50 active:scale-95">
+                                <i class="fa fa-battery-full mr-1"></i> 直流发电机
+                            </button>
+                            <button id="acGenerator" class="py-2 px-4 bg-gray-200 text-gray-700 rounded-lg text-sm font-medium transition-all duration-200 hover:bg-gray-300 focus:ring-2 focus:ring-gray-400/50 active:scale-95">
+                                <i class="fa fa-plug mr-1"></i> 交流发电机
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- 控制按钮 -->
+                    <div class="flex gap-3">
+                        <button id="startBtn" class="flex-1 py-2 px-4 bg-secondary text-white rounded-lg text-sm font-medium transition-all duration-200 hover:bg-secondary/90 focus:ring-2 focus:ring-secondary/50 active:scale-95">
+                            <i class="fa fa-play mr-1"></i> 启动
+                        </button>
+                        <button id="stopBtn" class="flex-1 py-2 px-4 bg-gray-200 text-gray-700 rounded-lg text-sm font-medium transition-all duration-200 hover:bg-gray-300 focus:ring-2 focus:ring-gray-400/50 active:scale-95" disabled>
+                            <i class="fa fa-stop mr-1"></i> 停止
+                        </button>
+                        <button id="resetBtn" class="py-2 px-4 bg-gray-200 text-gray-700 rounded-lg text-sm font-medium transition-all duration-200 hover:bg-gray-300 focus:ring-2 focus:ring-gray-400/50 active:scale-95">
+                            <i class="fa fa-refresh mr-1"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 发电数据显示 -->
+                <div class="mt-8 bg-gray-50 rounded-lg p-4 border border-gray-200">
+                    <h3 class="text-sm font-semibold text-gray-700 mb-3">发电数据</h3>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="bg-white p-3 rounded-lg border border-gray-200">
+                            <p class="text-xs text-gray-500 mb-1">电压 (V)</p>
+                            <p id="voltageValue" class="text-lg font-semibold text-primary">0.0</p>
+                        </div>
+                        <div class="bg-white p-3 rounded-lg border border-gray-200">
+                            <p class="text-xs text-gray-500 mb-1">电流 (A)</p>
+                            <p id="currentValue" class="text-lg font-semibold text-secondary">0.0</p>
+                        </div>
+                        <div class="bg-white p-3 rounded-lg border border-gray-200">
+                            <p class="text-xs text-gray-500 mb-1">功率 (W)</p>
+                            <p id="powerValue" class="text-lg font-semibold text-accent">0.0</p>
+                        </div>
+                        <div class="bg-white p-3 rounded-lg border border-gray-200">
+                            <p class="text-xs text-gray-500 mb-1">频率 (Hz)</p>
+                            <p id="frequencyValue" class="text-lg font-semibold text-purple-500">0.0</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 右侧动画展示区域 -->
+            <div class="lg:col-span-2 bg-white rounded-xl overflow-hidden generator-shadow transition-all duration-300 hover:shadow-xl">
+                <div class="p-6 border-b border-gray-100">
+                    <h2 class="text-xl font-semibold text-dark flex items-center">
+                        <i class="fa fa-bolt text-primary mr-2"></i>发电机工作原理动画
+                    </h2>
+                    <p class="text-sm text-gray-500 mt-1">通过调整左侧参数，观察发电机内部结构和电磁感应过程</p>
+                </div>
+                
+                <div class="relative">
+                    <!-- 发电机动画Canvas -->
+                    <canvas id="generatorCanvas" class="w-full h-[400px] bg-gray-50"></canvas>
+                    
+                    <!-- 发电机工作原理说明 -->
+                    <div class="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-lg p-3 shadow-md max-w-xs">
+                        <h3 class="text-sm font-semibold text-gray-800 mb-2">工作原理</h3>
+                        <ul class="text-xs text-gray-600 space-y-1">
+                            <li><i class="fa fa-circle text-xs text-primary mr-1"></i> 当线圈在磁场中旋转时，切割磁力线产生感应电动势</li>
+                            <li><i class="fa fa-circle text-xs text-primary mr-1"></i> 感应电动势大小与磁场强度、旋转速度和线圈匝数成正比</li>
+                            <li><i class="fa fa-circle text-xs text-primary mr-1"></i> 直流发电机通过换向器输出单向电流，交流发电机输出交变电流</li>
+                            <li><i class="fa fa-circle text-xs text-primary mr-1"></i> 负载电阻影响电流大小，遵循欧姆定律 <span class="font-medium">I = V/R</span></li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- 电压波形图表 -->
+                <div class="p-6 border-t border-gray-100">
+                    <h3 class="text-sm font-semibold text-gray-700 mb-3">电压波形图</h3>
+                    <canvas id="voltageChart" class="w-full h-[150px]"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 底部说明 -->
+        <footer class="mt-12 text-center text-sm text-gray-500">
+            <p>© 2025 广州供电局 | 发电机原理动画演示系统 | 技术支持：科技部</p>
+        </footer>
+    </div>
+
+    <script>
+        // 发电机参数
+        const generatorParams = {
+            magneticField: 5,       // 磁场强度 (1-10)
+            rotationSpeed: 3,       // 旋转速度 (1-10)
+            coilTurns: 10,          // 线圈匝数 (1-20)
+            loadResistance: 10,     // 负载电阻 (1-20)
+            isRunning: false,       // 是否运行中
+            isDCGenerator: true,    // 是否为直流发电机
+            rotationAngle: 0,       // 当前旋转角度
+            voltage: 0,             // 当前电压
+            current: 0,             // 当前电流
+            frequency: 0,           // 当前频率
+            voltageHistory: []      // 电压历史数据，用于波形图
+        };
+
+        // DOM元素
+        const magneticFieldSlider = document.getElementById('magneticField');
+        const magneticFieldValue = document.getElementById('magneticFieldValue');
+        const rotationSpeedSlider = document.getElementById('rotationSpeed');
+        const rotationSpeedValue = document.getElementById('rotationSpeedValue');
+        const coilTurnsSlider = document.getElementById('coilTurns');
+        const coilTurnsValue = document.getElementById('coilTurnsValue');
+        const loadResistanceSlider = document.getElementById('loadResistance');
+        const loadResistanceValue = document.getElementById('loadResistanceValue');
+        const dcGeneratorBtn = document.getElementById('dcGenerator');
+        const acGeneratorBtn = document.getElementById('acGenerator');
+        const startBtn = document.getElementById('startBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const voltageValue = document.getElementById('voltageValue');
+        const currentValue = document.getElementById('currentValue');
+        const powerValue = document.getElementById('powerValue');
+        const frequencyValue = document.getElementById('frequencyValue');
+        const generatorCanvas = document.getElementById('generatorCanvas');
+        const voltageChart = document.getElementById('voltageChart');
+        
+        // 获取Canvas上下文
+        const genCtx = generatorCanvas.getContext('2d');
+        const chartCtx = voltageChart.getContext('2d');
+        
+        // 设置Canvas尺寸
+        function resizeCanvases() {
+            const width = generatorCanvas.clientWidth;
+            generatorCanvas.width = width;
+            generatorCanvas.height = 400;
+            
+            voltageChart.width = width;
+            voltageChart.height = 150;
+            
+            // 重绘发电机和波形图
+            if (generatorParams.isRunning) {
+                drawGenerator();
+                updateVoltageChart();
+            } else {
+                drawGenerator();
+                initVoltageChart();
+            }
+        }
+        
+        // 初始化
+        function init() {
+            resizeCanvases();
+            window.addEventListener('resize', resizeCanvases);
+            
+            // 初始化发电机动画
+            drawGenerator();
+            
+            // 初始化电压波形图
+            initVoltageChart();
+            
+            // 绑定事件监听器
+            bindEventListeners();
+        }
+        
+        // 绑定事件监听器
+        function bindEventListeners() {
+            // 参数滑块事件
+            magneticFieldSlider.addEventListener('input', (e) => {
+                generatorParams.magneticField = parseInt(e.target.value);
+                magneticFieldValue.textContent = generatorParams.magneticField;
+                updateGeneratorValues();
+                if (!generatorParams.isRunning) {
+                    drawGenerator();
+                }
+            });
+            
+            rotationSpeedSlider.addEventListener('input', (e) => {
+                generatorParams.rotationSpeed = parseInt(e.target.value);
+                rotationSpeedValue.textContent = generatorParams.rotationSpeed;
+                generatorParams.frequency = generatorParams.rotationSpeed * 0.5;
+                frequencyValue.textContent = generatorParams.frequency.toFixed(1);
+                if (!generatorParams.isRunning) {
+                    updateGeneratorValues();
+                    drawGenerator();
+                }
+            });
+            
+            coilTurnsSlider.addEventListener('input', (e) => {
+                generatorParams.coilTurns = parseInt(e.target.value);
+                coilTurnsValue.textContent = generatorParams.coilTurns;
+                updateGeneratorValues();
+                if (!generatorParams.isRunning) {
+                    drawGenerator();
+                }
+            });
+            
+            loadResistanceSlider.addEventListener('input', (e) => {
+                generatorParams.loadResistance = parseInt(e.target.value);
+                loadResistanceValue.textContent = generatorParams.loadResistance;
+                updateGeneratorValues();
+            });
+            
+            // 发电机类型切换
+            dcGeneratorBtn.addEventListener('click', () => {
+                generatorParams.isDCGenerator = true;
+                dcGeneratorBtn.classList.remove('bg-gray-200', 'text-gray-700');
+                dcGeneratorBtn.classList.add('bg-primary', 'text-white');
+                acGeneratorBtn.classList.remove('bg-primary', 'text-white');
+                acGeneratorBtn.classList.add('bg-gray-200', 'text-gray-700');
+                clearVoltageHistory();
+                updateGeneratorValues();
+                if (!generatorParams.isRunning) {
+                    drawGenerator();
+                    initVoltageChart();
+                }
+            });
+            
+            acGeneratorBtn.addEventListener('click', () => {
+                generatorParams.isDCGenerator = false;
+                acGeneratorBtn.classList.remove('bg-gray-200', 'text-gray-700');
+                acGeneratorBtn.classList.add('bg-primary', 'text-white');
+                dcGeneratorBtn.classList.remove('bg-primary', 'text-white');
+                dcGeneratorBtn.classList.add('bg-gray-200', 'text-gray-700');
+                clearVoltageHistory();
+                updateGeneratorValues();
+                if (!generatorParams.isRunning) {
+                    drawGenerator();
+                    initVoltageChart();
+                }
+            });
+            
+            // 控制按钮事件
+            startBtn.addEventListener('click', startGenerator);
+            stopBtn.addEventListener('click', stopGenerator);
+            resetBtn.addEventListener('click', resetGenerator);
+        }
+        
+        // 开始发电机
+        function startGenerator() {
+            if (generatorParams.isRunning) return;
+            
+            generatorParams.isRunning = true;
+            startBtn.disabled = true;
+            startBtn.classList.remove('bg-secondary', 'hover:bg-secondary/90');
+            startBtn.classList.add('bg-gray-300', 'text-gray-500');
+            stopBtn.disabled = false;
+            stopBtn.classList.remove('bg-gray-200', 'text-gray-700');
+            stopBtn.classList.add('bg-red-500', 'text-white', 'hover:bg-red-600');
+            
+            // 开始动画循环
+            animationLoop();
+        }
+        
+        // 停止发电机
+        function stopGenerator() {
+            if (!generatorParams.isRunning) return;
+            
+            generatorParams.isRunning = false;
+            stopBtn.disabled = true;
+            stopBtn.classList.remove('bg-red-500', 'text-white', 'hover:bg-red-600');
+            stopBtn.classList.add('bg-gray-200', 'text-gray-700');
+            startBtn.disabled = false;
+            startBtn.classList.remove('bg-gray-300', 'text-gray-500');
+            startBtn.classList.add('bg-secondary', 'hover:bg-secondary/90');
+        }
+        
+        // 重置发电机
+        function resetGenerator() {
+            stopGenerator();
+            
+            // 重置参数
+            generatorParams.magneticField = 5;
+            generatorParams.rotationSpeed = 3;
+            generatorParams.coilTurns = 10;
+            generatorParams.loadResistance = 10;
+            generatorParams.rotationAngle = 0;
+            generatorParams.voltage = 0;
+            generatorParams.current = 0;
+            generatorParams.frequency = 0;
+            
+            // 更新UI
+            magneticFieldSlider.value = generatorParams.magneticField;
+            magneticFieldValue.textContent = generatorParams.magneticField;
+            rotationSpeedSlider.value = generatorParams.rotationSpeed;
+            rotationSpeedValue.textContent = generatorParams.rotationSpeed;
+            coilTurnsSlider.value = generatorParams.coilTurns;
+            coilTurnsValue.textContent = generatorParams.coilTurns;
+            loadResistanceSlider.value = generatorParams.loadResistance;
+            loadResistanceValue.textContent = generatorParams.loadResistance;
+            
+            // 重置图表
+            clearVoltageHistory();
+            updateGeneratorValues();
+            drawGenerator();
+            initVoltageChart();
+        }
+        
+        // 动画循环
+        function animationLoop() {
+            if (!generatorParams.isRunning) return;
+            
+            // 更新旋转角度
+            generatorParams.rotationAngle += generatorParams.rotationSpeed;
+            if (generatorParams.rotationAngle >= 360) {
+                generatorParams.rotationAngle -= 360;
+            }
+            
+            // 更新发电机数值
+            updateGeneratorValues();
+            
+            // 绘制发电机
+            drawGenerator();
+            
+            // 更新电压波形图
+            updateVoltageChart();
+            
+            // 继续动画循环
+            requestAnimationFrame(animationLoop);
+        }
+        
+        // 更新发电机数值
+        function updateGeneratorValues() {
+            // 计算感应电动势 (E = B * L * v * sinθ)
+            // 简化模型：E = B * N * ω * sinθ
+            const angleRadians = generatorParams.rotationAngle * Math.PI / 180;
+            const maxVoltage = generatorParams.magneticField * generatorParams.coilTurns * generatorParams.rotationSpeed;
+            const instantaneousVoltage = maxVoltage * Math.sin(angleRadians);
+            
+            // 直流发电机通过换向器使电压方向保持一致
+            if (generatorParams.isDCGenerator) {
+                generatorParams.voltage = Math.abs(instantaneousVoltage);
+            } else {
+                generatorParams.voltage = instantaneousVoltage;
+            }
+            
+            // 计算电流 (I = V/R)
+            generatorParams.current = generatorParams.voltage / generatorParams.loadResistance;
+            
+            // 计算功率 (P = V * I)
+            const power = generatorParams.voltage * generatorParams.current;
+            
+            // 计算频率
+            generatorParams.frequency = generatorParams.rotationSpeed * 0.5;
+            
+            // 更新UI显示
+            voltageValue.textContent = generatorParams.voltage.toFixed(1);
+            currentValue.textContent = generatorParams.current.toFixed(2);
+            powerValue.textContent = Math.abs(power).toFixed(2);
+            frequencyValue.textContent = generatorParams.frequency.toFixed(1);
+            
+            // 记录电压历史
+            generatorParams.voltageHistory.push(generatorParams.voltage);
+            if (generatorParams.voltageHistory.length > 100) {
+                generatorParams.voltageHistory.shift();
+            }
+        }
+        
+        // 绘制发电机
+        function drawGenerator() {
+            // 清除画布
+            genCtx.clearRect(0, 0, generatorCanvas.width, generatorCanvas.height);
+            
+            const width = generatorCanvas.width;
+            const height = generatorCanvas.height;
+            const centerX = width / 2;
+            const centerY = height / 2;
+            const scale = Math.min(width, height) / 400; // 缩放因子
+            
+            // 绘制背景
+            genCtx.fillStyle = '#F9FAFB';
+            genCtx.fillRect(0, 0, width, height);
+            
+            // 绘制发电机外壳
+            drawGeneratorHousing(centerX, centerY, scale);
+            
+            // 绘制磁场
+            drawMagneticField(centerX, centerY, scale);
+            
+            // 绘制旋转轴
+            drawRotationAxis(centerX, centerY, scale);
+            
+            // 绘制线圈
+            drawCoil(centerX, centerY, scale);
+            
+            // 绘制换向器/滑环
+            if (generatorParams.isDCGenerator) {
+                drawCommutator(centerX, centerY, scale);
+            } else {
+                drawSlipRings(centerX, centerY, scale);
+            }
+            
+            // 绘制电刷
+            drawBrushes(centerX, centerY, scale);
+            
+            // 绘制外电路和负载
+            drawExternalCircuit(centerX, centerY, scale);
+            
+            // 绘制电流方向指示器
+            drawCurrentIndicator(centerX, centerY, scale);
+        }
+        
+        // 绘制发电机外壳
+        function drawGeneratorHousing(x, y, scale) {
+            genCtx.fillStyle = '#E5E7EB';
+            genCtx.strokeStyle = '#9CA3AF';
+            genCtx.lineWidth = 3 * scale;
+            
+            // 绘制外壳主体
+            genCtx.beginPath();
+            genCtx.ellipse(x, y, 120 * scale, 80 * scale, 0, 0, Math.PI * 2);
+            genCtx.fill();
+            genCtx.stroke();
+            
+            // 绘制两端
+            genCtx.fillStyle = '#D1D5DB';
+            genCtx.beginPath();
+            genCtx.ellipse(x - 120 * scale, y, 15 * scale, 15 * scale, 0, 0, Math.PI * 2);
+            genCtx.fill();
+            genCtx.stroke();
+            
+            genCtx.beginPath();
+            genCtx.ellipse(x + 120 * scale, y, 15 * scale, 15 * scale, 0, 0, Math.PI * 2);
+            genCtx.fill();
+            genCtx.stroke();
+        }
+        
+        // 绘制磁场
+        function drawMagneticField(x, y, scale) {
+            // 绘制N极和S极
+            genCtx.fillStyle = '#4B5563';
+            
+            // N极
+            genCtx.beginPath();
+            genCtx.rect(x - 100 * scale, y - 100 * scale, 20 * scale, 50 * scale);
+            genCtx.fill();
+            
+            genCtx.fillStyle = '#1E40AF';
+            genCtx.font = `${14 * scale}px Arial`;
+            genCtx.textAlign = 'center';
+            genCtx.textBaseline = 'middle';
+            genCtx.fillText('N', x - 90 * scale, y - 120 * scale);
+            
+            // S极
+            genCtx.fillStyle = '#4B5563';
+            genCtx.beginPath();
+            genCtx.rect(x + 80 * scale, y - 100 * scale, 20 * scale, 50 * scale);
+            genCtx.fill();
+            
+            genCtx.fillStyle = '#991B1B';
+            genCtx.font = `${14 * scale}px Arial`;
+            genCtx.textAlign = 'center';
+            genCtx.textBaseline = 'middle';
+            genCtx.fillText('S', x + 90 * scale, y - 120 * scale);
+            
+            // 绘制磁力线
+            genCtx.strokeStyle = '#9CA3AF';
+            genCtx.lineWidth = 1.5 * scale;
+            
+            for (let i = 0; i < 5; i++) {
+                const offset = (i - 2) * 15 * scale;
+                genCtx.beginPath();
+                genCtx.moveTo(x - 90 * scale, y - 75 * scale + offset);
+                genCtx.bezierCurveTo(
+                    x - 50 * scale, y - 120 * scale + offset,
+                    x + 50 * scale, y - 120 * scale + offset,
+                    x + 90 * scale, y - 75 * scale + offset
+                );
+                genCtx.stroke();
+                
+                // 绘制箭头
+                drawArrowHead(x - 50 * scale + (i * 40 * scale), y - 100 * scale + offset, 0, scale);
+            }
+        }
+        
+        // 绘制旋转轴
+        function drawRotationAxis(x, y, scale) {
+            genCtx.strokeStyle = '#4B5563';
+            genCtx.lineWidth = 5 * scale;
+            
+            genCtx.beginPath();
+            genCtx.moveTo(x - 120 * scale, y);
+            genCtx.lineTo(x + 120 * scale, y);
+            genCtx.stroke();
+        }
+        
+        // 绘制线圈
+        function drawCoil(x, y, scale) {
+            const angle = generatorParams.rotationAngle * Math.PI / 180;
+            const coilSize = 40 * scale;
+            const wireThickness = 3 * scale;
+            
+            // 保存当前上下文状态
+            genCtx.save();
+            
+            // 旋转画布到线圈当前角度
+            genCtx.translate(x, y);
+            genCtx.rotate(angle);
+            genCtx.translate(-x, -y);
+            
+            // 绘制线圈框架
+            genCtx.strokeStyle = '#9CA3AF';
+            genCtx.lineWidth = 2 * scale;
+            genCtx.beginPath();
+            genCtx.rect(x - coilSize, y - coilSize, coilSize * 2, coilSize * 2);
+            genCtx.stroke();
+            
+            // 绘制线圈导线
+            genCtx.strokeStyle = '#D97706';
+            genCtx.lineWidth = wireThickness;
+            
+            // 绘制多匝线圈
+            for (let i = 0; i < generatorParams.coilTurns; i++) {
+                const offset = i * 2 * scale;
+                const size = coilSize - offset;
+                
+                if (size <= 0) break;
+                
+                genCtx.beginPath();
+                genCtx.rect(x - size, y - size, size * 2, size * 2);
+                genCtx.stroke();
+            }
+            
+            // 恢复上下文状态
+            genCtx.restore();
+        }
+        
+        // 绘制换向器
+        function drawCommutator(x, y, scale) {
+            const angle = generatorParams.rotationAngle * Math.PI / 180;
+            const radius = 15 * scale;
+            
+            // 保存当前上下文状态
+            genCtx.save();
+            
+            // 旋转画布到当前角度
+            genCtx.translate(x - 120 * scale, y);
+            genCtx.rotate(angle);
+            genCtx.translate(-(x - 120 * scale), -y);
+            
+            // 绘制换向器两半
+            genCtx.fillStyle = '#94A3B8';
+            genCtx.beginPath();
+            genCtx.arc(x - 120 * scale, y, radius, 0, Math.PI);
+            genCtx.fill();
+            
+            genCtx.beginPath();
+            genCtx.arc(x - 120 * scale, y, radius, Math.PI, Math.PI * 2);
+            genCtx.fill();
+            
+            // 绘制绝缘层
+            genCtx.strokeStyle = '#1F2937';
+            genCtx.lineWidth = 2 * scale;
+            genCtx.beginPath();
+            genCtx.moveTo(x - 120 * scale - radius, y);
+            genCtx.lineTo(x - 120 * scale + radius, y);
+            genCtx.stroke();
+            
+            // 恢复上下文状态
+            genCtx.restore();
+        }
+        
+        // 绘制滑环
+        function drawSlipRings(x, y, scale) {
+            const angle = generatorParams.rotationAngle * Math.PI / 180;
+            const radius = 15 * scale;
+            const separation = 10 * scale;
+            
+            // 保存当前上下文状态
+            genCtx.save();
+            
+            // 旋转画布到当前角度
+            genCtx.translate(x - 120 * scale, y);
+            genCtx.rotate(angle);
+            genCtx.translate(-(x - 120 * scale), -y);
+            
+            // 绘制两个滑环
+            genCtx.fillStyle = '#94A3B8';
+            
+            // 外环
+            genCtx.beginPath();
+            genCtx.arc(x - 120 * scale - separation/2, y, radius, 0, Math.PI * 2);
+            genCtx.fill();
+            
+            // 内环
+            genCtx.beginPath();
+            genCtx.arc(x - 120 * scale + separation/2, y, radius, 0, Math.PI * 2);
+            genCtx.fill();
+            
+            // 绘制绝缘层
+            genCtx.strokeStyle = '#1F2937';
+            genCtx.lineWidth = 2 * scale;
+            genCtx.beginPath();
+            genCtx.arc(x - 120 * scale - separation/2, y, radius + 3 * scale, 0, Math.PI * 2);
+            genCtx.stroke();
+            
+            genCtx.beginPath();
+            genCtx.arc(x - 120 * scale + separation/2, y, radius + 3 * scale, 0, Math.PI * 2);
+            genCtx.stroke();
+            
+            // 恢复上下文状态
+            genCtx.restore();
+        }
+        
+        // 绘制电刷
+        function drawBrushes(x, y, scale) {
+            // 绘制固定支架
+            genCtx.strokeStyle = '#4B5563';
+            genCtx.lineWidth = 3 * scale;
+            
+            // 上支架
+            genCtx.beginPath();
+            genCtx.moveTo(x - 140 * scale, y - 30 * scale);
+            genCtx.lineTo(x - 100 * scale, y - 30 * scale);
+            genCtx.stroke();
+            
+            // 下支架
+            genCtx.beginPath();
+            genCtx.moveTo(x - 140 * scale, y + 30 * scale);
+            genCtx.lineTo(x - 100 * scale, y + 30 * scale);
+            genCtx.stroke();
+            
+            // 绘制电刷
+            genCtx.fillStyle = '#1F2937';
+            
+            // 上电刷
+            genCtx.beginPath();
+            genCtx.rect(x - 105 * scale, y - 30 * scale, 5 * scale, 15 * scale);
+            genCtx.fill();
+            
+            // 下电刷
+            genCtx.beginPath();
+            genCtx.rect(x - 105 * scale, y + 15 * scale, 5 * scale, 15 * scale);
+            genCtx.fill();
+        }
+        
+        // 绘制外电路和负载
+        function drawExternalCircuit(x, y, scale) {
+            // 绘制电路线
+            genCtx.strokeStyle = '#D97706';
+            genCtx.lineWidth = 3 * scale;
+            
+            // 左侧线
+            genCtx.beginPath();
+            genCtx.moveTo(x - 100 * scale, y - 30 * scale);
+            genCtx.lineTo(x - 100 * scale, y - 150 * scale);
+            genCtx.lineTo(x + 100 * scale, y - 150 * scale);
+            genCtx.stroke();
+            
+            // 右侧线
+            genCtx.beginPath();
+            genCtx.moveTo(x - 100 * scale, y + 30 * scale);
+            genCtx.lineTo(x - 100 * scale, y + 150 * scale);
+            genCtx.lineTo(x + 100 * scale, y + 150 * scale);
+            genCtx.stroke();
+            
+            // 绘制负载电阻
+            const resistorHeight = 20 * scale;
+            const resistorWidth = 30 * scale;
+            
+            genCtx.strokeStyle = '#4B5563';
+            genCtx.lineWidth = 3 * scale;
+            
+            // 左侧连接线
+            genCtx.beginPath();
+            genCtx.moveTo(x + 100 * scale, y - 150 * scale);
+            genCtx.lineTo(x + 100 * scale - resistorWidth/2, y - 150 * scale);
+            genCtx.stroke();
+            
+            // 右侧连接线
+            genCtx.beginPath();
+            genCtx.moveTo(x + 100 * scale, y + 150 * scale);
+            genCtx.lineTo(x + 100 * scale - resistorWidth/2, y + 150 * scale);
+            genCtx.stroke();
+            
+            // 电阻符号
+            genCtx.beginPath();
+            genCtx.moveTo(x + 100 * scale - resistorWidth/2, y - 150 * scale);
+            genCtx.lineTo(x + 100 * scale - resistorWidth/2, y - 150 * scale + resistorHeight/4);
+            
+            // 锯齿形
+            for (let i = 0; i < 4; i++) {
+                const direction = i % 2 === 0 ? 1 : -1;
+                genCtx.lineTo(
+                    x + 100 * scale - resistorWidth/2 + direction * resistorWidth/4,
+                    y - 150 * scale + resistorHeight/4 + i * resistorHeight/4
+                );
+                genCtx.lineTo(
+                    x + 100 * scale - resistorWidth/2 - direction * resistorWidth/4,
+                    y - 150 * scale + resistorHeight/4 + (i + 1) * resistorHeight/4
+                );
+            }
+            
+            genCtx.lineTo(x + 100 * scale - resistorWidth/2, y - 150 * scale + resistorHeight);
+            genCtx.lineTo(x + 100 * scale - resistorWidth/2, y + 150 * scale);
+            genCtx.stroke();
+            
+            // 标记电阻
+            genCtx.fillStyle = '#4B5563';
+            genCtx.font = `${12 * scale}px Arial`;
+            genCtx.textAlign = 'center';
+            genCtx.textBaseline = 'middle';
+            genCtx.fillText('R', x + 100 * scale - resistorWidth/4, y);
+        }
+        
+        // 绘制电流方向指示器
+        function drawCurrentIndicator(x, y, scale) {
+            if (!generatorParams.isRunning || Math.abs(generatorParams.current) < 0.1) return;
+            
+            const wireDistance = 30 * scale;
+            const arrowSize = 8 * scale;
+            const isPositive = generatorParams.voltage > 0;
+            
+            genCtx.strokeStyle = isPositive ? '#22C55E' : '#EF4444';
+            genCtx.fillStyle = isPositive ? '#22C55E' : '#EF4444';
+            genCtx.lineWidth = 2 * scale;
+            
+            // 绘制左侧电路上的箭头
+            const leftX = x - 100 * scale;
+            const topY = y - wireDistance;
+            const bottomY = y + wireDistance;
+            
+            // 上侧水平导线
+            drawArrowHead(x - 70 * scale, topY, 0, arrowSize);
+            
+            // 左侧垂直导线
+            if (generatorParams.isDCGenerator || isPositive) {
+                drawArrowHead(leftX, y - 70 * scale, Math.PI/2, arrowSize);
+            } else {
+                drawArrowHead(leftX, y - 70 * scale, -Math.PI/2, arrowSize);
+            }
+            
+            // 下侧水平导线
+            drawArrowHead(x - 70 * scale, bottomY, Math.PI, arrowSize);
+            
+            // 右侧垂直导线
+            const rightX = x + 100 * scale;
+            if (generatorParams.isDCGenerator || isPositive) {
+                drawArrowHead(rightX, y + 70 * scale, -Math.PI/2, arrowSize);
+            } else {
+                drawArrowHead(rightX, y + 70 * scale, Math.PI/2, arrowSize);
+            }
+            
+            // 绘制线圈内的电流方向
+            const angleRadians = generatorParams.rotationAngle * Math.PI / 180;
+            const coilSize = 40 * scale;
+            
+            // 计算线圈上的点
+            const point1X = x + Math.cos(angleRadians) * coilSize;
+            const point1Y = y + Math.sin(angleRadians) * coilSize;
+            const point2X = x - Math.cos(angleRadians) * coilSize;
+            const point2Y = y - Math.sin(angleRadians) * coilSize;
+            
+            // 计算垂直于线圈方向的向量
+            const perpX = -Math.sin(angleRadians);
+            const perpY = Math.cos(angleRadians);
+            
+            // 确定电流方向
+            let arrowAngle = angleRadians + (isPositive ? Math.PI/2 : -Math.PI/2);
+            
+            // 在线圈两侧绘制箭头
+            drawArrowHead(point1X + perpX * 5 * scale, point1Y + perpY * 5 * scale, arrowAngle, arrowSize);
+            drawArrowHead(point2X - perpX * 5 * scale, point2Y - perpY * 5 * scale, arrowAngle + Math.PI, arrowSize);
+        }
+        
+        // 绘制箭头
+        function drawArrowHead(x, y, angle, size) {
+            genCtx.save();
+            genCtx.translate(x

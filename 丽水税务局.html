@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>丽水市税务局 - 服务纳税人，促进地方发展</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#1e40af', // 深蓝色作为主色调，代表专业和信任
+            secondary: '#0ea5e9', // 浅蓝色作为辅助色
+            accent: '#f97316', // 橙色作为强调色，用于重要行动按钮
+            dark: '#1e293b', // 深色用于标题和正文
+            light: '#f8fafc', // 浅色用于背景
+          },
+          fontFamily: {
+            inter: ['Inter', 'system-ui', 'sans-serif'],
+          },
+        },
+      }
+    }
+  </script>
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .content-auto {
+        content-visibility: auto;
+      }
+      .text-shadow {
+        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      }
+      .card-hover {
+        transition: all 0.3s ease;
+      }
+      .card-hover:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      }
+      .gradient-bg {
+        background: linear-gradient(120deg, #1e40af, #0ea5e9);
+      }
+      .text-balance {
+        text-wrap: balance;
+      }
+    }
+  </style>
+</head>
+<body class="font-inter bg-light text-dark">
+  <!-- 导航栏 -->
+  <header id="navbar" class="fixed w-full top-0 z-50 transition-all duration-300 bg-white/90 backdrop-blur-sm shadow-sm">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16 md:h-20">
+        <div class="flex items-center">
+          <a href="#" class="flex items-center">
+            <i class="fa fa-building-columns text-primary text-2xl mr-2"></i>
+            <span class="text-xl font-bold text-primary">丽水市税务局</span>
+          </a>
+        </div>
+        
+        <!-- 桌面导航 -->
+        <nav class="hidden md:flex space-x-8">
+          <a href="#home" class="text-dark hover:text-primary font-medium transition-colors">首页</a>
+          <a href="#services" class="text-dark hover:text-primary font-medium transition-colors">服务大厅</a>
+          <a href="#news" class="text-dark hover:text-primary font-medium transition-colors">政策法规</a>
+          <a href="#publicity" class="text-dark hover:text-primary font-medium transition-colors">税务宣传</a>
+          <a href="#contact" class="text-dark hover:text-primary font-medium transition-colors">联系我们</a>
+        </nav>
+        
+        <!-- 移动端菜单按钮 -->
+        <div class="md:hidden">
+          <button id="menu-toggle" class="text-dark hover:text-primary focus:outline-none">
+            <i class="fa fa-bars text-xl"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 移动端导航菜单 -->
+    <div id="mobile-menu" class="hidden md:hidden bg-white border-t">
+      <div class="container mx-auto px-4 py-3 space-y-2">
+        <a href="#home" class="block py-2 text-dark hover:text-primary font-medium">首页</a>
+        <a href="#services" class="block py-2 text-dark hover:text-primary font-medium">服务大厅</a>
+        <a href="#news" class="block py-2 text-dark hover:text-primary font-medium">政策法规</a>
+        <a href="#publicity" class="block py-2 text-dark hover:text-primary font-medium">税务宣传</a>
+        <a href="#contact" class="block py-2 text-dark hover:text-primary font-medium">联系我们</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- 英雄区域 -->
+  <section id="home" class="pt-24 md:pt-32 pb-16 md:pb-24 gradient-bg text-white">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-col md:flex-row items-center">
+        <div class="md:w-1/2 mb-10 md:mb-0">
+          <h1 class="text-[clamp(2rem,5vw,3.5rem)] font-bold leading-tight text-shadow mb-6">
+            服务纳税人<br>促进地方发展
+          </h1>
+          <p class="text-[clamp(1rem,2vw,1.25rem)] text-white/90 mb-8 max-w-xl text-balance">
+            丽水市税务局致力于提供高效、便捷的税务服务，贯彻落实国家税收政策，为地方经济发展贡献力量。
+          </p>
+          <div class="flex flex-wrap gap-4">
+            <a href="#services" class="px-6 py-3 bg-accent hover:bg-accent/90 text-white font-medium rounded-lg shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1">
+              在线办税 <i class="fa fa-arrow-right ml-2"></i>
+            </a>
+            <a href="#publicity" class="px-6 py-3 bg-white/20 hover:bg-white/30 text-white font-medium rounded-lg backdrop-blur-sm transition-all transform hover:-translate-y-1">
+              了解税收知识 <i class="fa fa-book ml-2"></i>
+            </a>
+          </div>
+        </div>
+        <div class="md:w-1/2 flex justify-center">
+          <img src="https://picsum.photos/seed/tax/600/400" alt="税务服务" class="rounded-lg shadow-2xl max-w-full h-auto transform hover:scale-105 transition-transform duration-500">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 服务大厅 -->
+  <section id="services" class="py-16 bg-white">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold text-dark mb-4">服务大厅</h2>
+        <p class="text-gray-600 max-w-2xl mx-auto text-balance">
+          我们提供全方位的税务服务，让您的办税体验更加便捷高效。以下是我们的主要服务项目：
+        </p>
+      </div>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <!-- 服务卡片 1 -->
+        <div class="bg-light rounded-xl shadow-md overflow-hidden card-hover">
+          <div class="h-48 overflow-hidden">
+            <img src="https://picsum.photos/seed/taxservice1/600/400" alt="企业税务登记" class="w-full h-full object-cover">
+          </div>
+          <div class="p-6">
+            <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+              <i class="fa fa-building text-primary text-xl"></i>
+            </div>
+            <h3 class="text-xl font-bold mb-3">企业税务登记</h3>
+            <p class="text-gray-600 mb-4">
+              提供新办企业税务登记、变更登记、注销登记等全方位服务，让您的企业税务登记无忧。
+            </p>
+            <a href="#" class="text-primary hover:text-primary/80 font-medium inline-flex items-center">
+              了解详情 <i class="fa fa-arrow-right ml-2"></i>
+            </a>
+          </div>
+        </div>
+        
+        <!-- 服务卡片 2 -->
+        <div class="bg-light rounded-xl shadow-md overflow-hidden card-hover">
+          <div class="h-48 overflow-hidden">
+            <img src="https://picsum.photos/seed/taxservice2/600/400" alt="纳税申报" class="w-full h-full object-cover">
+          </div>
+          <div class="p-6">
+            <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+              <i class="fa fa-file-text text-primary text-xl"></i>
+            </div>
+            <h3 class="text-xl font-bold mb-3">纳税申报</h3>
+            <p class="text-gray-600 mb-4">
+              提供各类税种的在线申报服务，支持多种申报方式，让您随时随地完成纳税申报。
+            </p>
+            <a href="#" class="text-primary hover:text-primary/80 font-medium inline-flex items-center">
+              了解详情 <i class="fa fa-arrow-right ml-2"></i>
+            </a>
+          </div>
+        </div>
+        
+        <!-- 服务卡片 3 -->
+        <div class="bg-light rounded-xl shadow-md overflow-hidden card-hover">
+          <div class="h-48 overflow-hidden">
+            <img src="https://picsum.photos/seed/taxservice3/600/400" alt="发票服务" class="w-full h-full object-cover">
+          </div>
+          <div class="p-6">
+            <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+              <i class="fa fa-receipt text-primary text-xl"></i>
+            </div>
+            <h3 class="text-xl font-bold mb-3">发票服务</h3>
+            <p class="text-gray-600 mb-4">
+              提供发票申领、代开、查验等服务，支持电子发票和纸质发票，满足您的多样化需求。
+            </p>
+            <a href="#" class="text-primary hover:text-primary/80 font-medium inline-flex items-center">
+              了解详情 <i class="fa fa-arrow-right ml-2"></i>
+            </a>
+          </div>
+        </div>
+        
+        <!-- 服务卡片 4 -->
+        <div class="bg-light rounded-xl shadow-md overflow-hidden card-hover">
+          <div class="h-48 overflow-hidden">
+            <img src="https://picsum.photos/seed/taxservice4/600/400" alt="税收优惠" class="w-full h-full object-cover">
+          </div>
+          <div class="p-6">
+            <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+              <i class="fa fa-percent text-primary text-xl"></i>
+            </div>
+            <h3 class="text-xl font-bold mb-3">税收优惠</h3>
+            <p class="text-gray-600 mb-4">
+              提供各类税收优惠政策咨询和申请服务，帮助企业和个人充分享受税收优惠。
+            </p>
+            <a href="#" class="text-primary hover:text-primary/80 font-medium inline-flex items-center">
+              了解详情 <i class="fa fa-arrow-right ml-2"></i>
+            </a>
+          </div>
+        </div>
+        
+        <!-- 服务卡片 5 -->
+        <div class="bg-light rounded-xl shadow-md overflow-hidden card-hover">
+          <div class="h-48 overflow-hidden">
+            <img src="https://picsum.photos/seed/taxservice5/600/400" alt="税务咨询" class="w-full h-full object-cover">
+          </div>
+          <div class="p-6">
+            <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+              <i class="fa fa-question-circle text-primary text-xl"></i>
+            </div>
+            <h3 class="text-xl font-bold mb-3">税务咨询</h3>
+            <p class="text-gray-600 mb-4">
+              提供专业的税务咨询服务，解答您在税务方面的疑问，让您的税务问题得到及时解决。
+            </p>
+            <a href="#" class="text-primary hover:text-primary/80 font-medium inline-flex items-center">
+              了解详情 <i class="fa fa-arrow-right ml-2"></i>
+            </a>
+          </div>
+        </div>
+        
+        <!-- 服务卡片 6 -->
+        <div class="bg-light rounded-xl shadow-md overflow-hidden card-hover">
+          <div class="h-48 overflow-hidden">
+            <img src="https://picsum.photos/seed/taxservice6/600/400" alt="税务稽查" class="w-full h-full object-cover">
+          </div>
+          <div class="p-6">
+            <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+              <i class="fa fa-search text-primary text-xl"></i>
+            </div>
+            <h3 class="text-xl font-bold mb-3">税务稽查</h3>
+            <p class="text-gray-600 mb-4">
+              提供税务稽查相关服务，帮助企业规范税务管理，降低税务风险。
+            </p>
+            <a href="#" class="text-primary hover:text-primary/80 font-medium inline-flex items-center">
+              了解详情 <i class="fa fa-arrow-right ml-2"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+      
+      <div class="text-center mt-12">
+        <a href="#" class="px-6 py-3 bg-primary hover:bg-primary/90 text-white font-medium rounded-lg shadow-md hover:shadow-lg transition-all transform hover:-translate-y-1">
+          查看全部服务 <i class="fa fa-th-list ml-2"></i>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 政策法规 -->
+  <section id="news" class="py-16 bg-gray-50">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold text-dark mb-4">最新政策法规</h2>
+        <p class="text-gray-600 max-w-2xl mx-auto text-balance">
+          及时了解国家和地方最新税收政策法规，确保您的税务行为合法合规。
+        </p>
+      </div>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <!-- 政策卡片 1 -->
+        <div class="bg-white rounded-xl shadow-md overflow-hidden card-hover">
+          <div class="p-6">
+            <div class="flex items-center mb-4">
+              <div class="w-2 h-2 rounded-full bg-accent mr-2"></div>
+              <span class="text-sm font-medium text-accent">最新发布</span>
+            </div>
+            <h3 class="text-xl font-bold mb-3">关于进一步支持小微企业发展的税收政策</h3>
+            <p class="text-gray-600 mb-4 line-clamp-3">
+              为进一步支持小微企业发展，国家出台了一系列税收优惠政策，包括增值税减免、企业所得税优惠等，政策执行期限为2025年1月1日至2027年12月31日。
+            </p>
+            <div class="flex justify-between items-center">
+              <span class="text-sm text-gray-500">2025-05-15</span>
+              <a href="#" class="text-primary hover:text-primary/80 font-medium">
+                查看详情 <i class="fa fa-angle-right ml-1"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 政策卡片 2 -->
+        <div class="bg-white rounded-xl shadow-md overflow-hidden card-hover">
+          <div class="p-6">
+            <div class="flex items-center mb-4">
+              <div class="w-2 h-2 rounded-full bg-primary mr-2"></div>
+              <span class="text-sm font-medium text-primary">政策解读</span>
+            </div>
+            <h3 class="text-xl font-bold mb-3">个人所得税专项附加扣除政策解读</h3>
+            <p class="text-gray-600 mb-4 line-clamp-3">
+              本文详细解读了个人所得税专项附加扣除政策，包括子女教育、继续教育、大病医疗、住房贷款利息、住房租金、赡养老人等六项专项附加扣除的具体标准和操作流程。
+            </p>
+            <div class="flex justify-between items-center">
+              <span class="text-sm text-gray-500">2025-05-10</span>
+              <a href="#" class="text-primary hover:text-primary/80 font-medium">
+                查看详情 <i class="fa fa-angle-right ml-1"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 政策卡片 3 -->
+        <div class="bg-white rounded-xl shadow-md overflow-hidden card-hover">
+          <div class="p-6">
+            <div class="flex items-center mb-4">
+              <div class="w-2 h-2 rounded-full bg-secondary mr-2"></div>
+              <span class="text-sm font-medium text-secondary">地方政策</span>
+            </div>
+            <h3 class="text-xl font-bold mb-3">丽水市关于支持绿色产业发展的税收优惠政策</h3>
+            <p class="text-gray-600 mb-4 line-clamp-3">
+              为支持丽水市绿色产业发展，推动生态文明建设，我市出台了一系列税收优惠政策，对符合条件的绿色企业给予增值税、企业所得税等方面的优惠。
+            </p>
+            <div class="flex justify-between items-center">
+              <span class="text-sm text-gray-500">2025-05-05</span>
+              <a href="#" class="text-primary hover:text-primary/80 font-medium">
+                查看详情 <i class="fa fa-angle-right ml-1"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="mt-12 flex justify-center">
+        <nav class="inline-flex rounded-md shadow-sm" aria-label="Pagination">
+          <a href="#" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+            <i class="fa fa-chevron-left text-xs"></i>
+          </a>
+          <a href="#" class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-primary text-sm font-medium text-white">
+            1
+          </a>
+          <a href="#" class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
+            2
+          </a>
+          <a href="#" class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
+            3
+          </a>
+          <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700">
+            ...
+          </span>
+          <a href="#" class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
+            10
+          </a>
+          <a href="#" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+            <i class="fa fa-chevron-right text-xs"></i>
+          </a>
+        </nav>
+      </div>
+    </div>
+  </section>
+
+  <!-- 税务宣传 -->
+  <section id="publicity" class="py-16 bg-white">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold text-dark mb-4">税务知识宣传</h2>
+        <p class="text-gray-600 max-w-2xl mx-auto text-balance">
+          我们致力于普及税收知识，提高公民纳税意识，让您更好地了解税收、支持税收。
+        </p>
+      </div>
+      
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        <div>
+          <div class="bg-light rounded-xl shadow-md overflow-hidden">
+            <div class="aspect-video">
+              <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ?controls=0" title="税收知识宣传片" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen class="w-full h-full"></iframe>
+            </div>
+            <div class="p-6">
+              <h3 class="text-xl font-bold mb-2">税收知识宣传片</h3>
+              <p class="text-gray-600">
+                本视频详细介绍了税收的基本知识、税收的作用以及公民的纳税义务，帮助您更好地了解税收。
+              </p>
+            </div>
+          </div>
+        </div>
+        
+        <div>
+          <div class="space-y-6">
+            <!-- 宣传项目 1 -->
+            <div class="flex gap-4 items-start">
+              <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                <i class="fa fa-book text-primary text-xl"></i>
+              </div>
+              <div>
+                <h3 class="text-lg font-bold mb-2">税收知识手册</h3>
+                <p class="text-gray-600">
+                  我们编制了详细的税收知识手册，涵盖了个人所得税、企业所得税、增值税等主要税种的基本知识和申报流程。
+                </p>
+                <a href="#" class="text-primary hover:text-primary/80 font-medium inline-flex items-center mt-2">
+                  下载手册 <i class="fa fa-download ml-2"></i>
+                </a>
+              </div>
+            </div>
+            
+            <!-- 宣传项目 2 -->
+            <div class="flex gap-4 items-start">
+              <div class="w-12 h-12 rounded-full bg-secondary/10 flex items-center justify-center flex-shrink-0">
+                <i class="fa fa-calendar text-secondary text-xl"></i>
+              </div>
+              <div>
+                <h3 class="text-lg font-bold mb-2">税收宣传月活动</h3>
+                <p class="text-gray-600">
+                  每年4月是全国税收宣传月，我们将组织一系列宣传活动，包括税收知识讲座、在线问答、走进企业等，欢迎参与。
+                </p>
+                <a href="#" class="text-secondary hover:text-secondary/80 font-medium inline-flex items-center mt-2">
+                  了解活动安排 <i class="fa fa-calendar-check ml-2"></i>
+                </a>
+              </div>
+            </div>
+            
+            <!-- 宣传项目 3 -->
+            <div class="flex gap-4 items-start">
+              <div class="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center flex-shrink-0">
+                <i class="fa fa-users text-accent text-xl"></i>
+              </div>
+              <div>
+                <h3 class="text-lg font-bold mb-2">纳税人学堂</h3>
+                <p class="text-gray-600">
+                  我们开设了纳税人学堂，定期举办线上线下培训课程，帮助纳税人了解税收政策，掌握申报技能。
+                </p>
+                <a href="#" class="text-accent hover:text-accent/80 font-medium inline-flex items-center mt-2">
+                  报名参加 <i class="fa fa-user-plus ml-2"></i>
+                </a>
+              </div>
+            </div>
+            
+            <!-- 宣传项目 4 -->
+            <div class="flex gap-4 items-start">
+              <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                <i class="fa fa-question-circle text-green-600 text-xl"></i>
+              </div>
+              <div>
+                <h3 class="text-lg font-bold mb-2">常见问题解答</h3>
+                <p class="text-gray-600">
+                  我们整理了纳税人常见的税收问题及解答，帮助您快速解决遇到的税务问题。
+                </p>
+                <a href="#" class="text-green-600 hover:text-green-700 font-medium inline-flex items-center mt-2">
+                  查看常见问题 <i class="fa fa-question-circle ml-2"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 统计数据 -->
+  <section class="py-16 gradient-bg text-white">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+        <div class="p-6">
+          <div class="text-4xl md:text-5xl font-bold mb-2" id="counter-1">0</div>
+          <p class="text-white/80">纳税人满意度</p>
+        </div>
+        <div class="p-6">
+          <div class="text-4xl md:text-5xl font-bold mb-2" id="counter-2">0</div>
+          <p class="text-white/80">线上服务覆盖率</p>
+        </div>
+        <div class="p-6">
+          <div class="text-4xl md:text-5xl font-bold mb-2" id="counter-3">0</div>
+          <p class="text-white/80">税收政策知晓率</p>
+        </div>
+        <div class="p-6">
+          <div class="text-4xl md:text-5xl font-bold mb-2" id="counter-4">0</div>
+          <p class="text-white/80">年服务人次</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 联系我们 -->
+  <section id="contact" class="py-16 bg-white">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold text-dark mb-4">联系我们</h2>
+        <p class="text-gray-600 max-w-2xl mx-auto text-balance">
+          如果您有任何问题或建议，欢迎通过以下方式联系我们，我们将竭诚为您服务。
+        </p>
+      </div>
+      
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+        <div>
+          <div class="bg-light rounded-xl shadow-md p-8 h-full">
+            <h3 class="text-xl font-bold mb-6">联系方式</h3>
+            
+            <div class="space-y-6">
+              <div class="flex items-start">
+                <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                  <i class="fa fa-map-marker text-primary text-xl"></i>
+                </div>
+                <div class="ml-4">
+                  <h4 class="font-medium text-dark">办公地址</h4>
+                  <p class="text-gray-600">浙江省丽水市莲都区北苑路190号</p>
+                </div>
+              </div>
+              
+              <div class="flex items-start">
+                <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                  <i class="fa fa-phone text-primary text-xl"></i>
+                </div>
+                <div class="ml-4">
+                  <h4 class="font-medium text-dark">联系电话</h4>
+                  <p class="text-gray-600">0578-12345678</p>
+                  <p class="text-gray-600">纳税服务热线：12366</p>
+                </div>
+              </div>
+              
+              <div class="flex items-start">
+                <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                  <i class="fa fa-envelope text-primary text-xl"></i>
+                </div>
+                <div class="ml-4">
+                  <h4 class="font-medium text-dark">电子邮箱</h4>
+                  <p class="text-gray-600">ls-tax@zj.gov.cn</p>
+                </div>
+              </div>
+              
+              <div class="flex items-start">
+                <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                  <i class="fa fa-clock-o text-primary text-xl"></i>
+                </div>
+                <div class="ml-4">
+                  <h4 class="font-medium text-dark">办公时间</h4>
+                  <p class="text-gray-600">周一至周五: 8:30 - 12:00, 14:00 - 17:30</p>
+                  <p class="text-gray-600">周六、周日及法定节假日休息</p>
+                </div>
+              </div>
+            </div>
+            
+            <div class="mt-8">
+              <h4 class="font-medium text-dark mb-4">关注我们</h4>
+              <div class="flex space-x-4">
+                <a href="#" class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-colors">
+                  <i class="fa fa-weixin"></i>
+                </a>
+                <a href="#" class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-colors">
+                  <i class="fa fa-weibo"></i>
+                </a>
+                <a href="#" class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-colors">
+                  <i class="fa fa-youtube-play"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div>
+          <div class="bg-light rounded-xl shadow-md p-8 h-full">
+            <h3 class="text-xl font-bold mb-6">在线留言</h3>
+            
+            <form id="contact-form" class="space-y-6">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label for="name" class="block text-sm font-medium text-gray-700 mb-1">姓名</label>
+                  <input type="text" id="name" name="name" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-colors" placeholder="请输入您的姓名" required>
+                </div>
+                <div>
+                  <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">电话</label>
+                  <input type="tel" id="phone" name="phone" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-colors" placeholder="请输入您的电话" required>
+                </div>
+              </div>
+              
+              <div>
+                <label for="email" class="block text-sm font-medium text-gray-700 mb-1">邮箱</label>
+                <input type="email" id="email" name="email" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-colors" placeholder="请输入您的邮箱" required>
+              </div>
+              
+              <div>
+                <label for="subject" class="block text-sm font-medium text-gray-700 mb-1">主题</label>
+                <input type="text" id="subject" name="subject" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-colors" placeholder="请输入留言主题" required>
+              </div>
+              
+              <div>
+                <label for="message" class="block text-sm font-medium text-gray-700 mb-1">留言内容</label>
+                <textarea id="message" name="message" rows="5" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-colors" placeholder="请输入您的留言内容" required></textarea>
+              </div>
+              
+              <div class="flex items-center">
+                <input id="policy" name="policy" type="checkbox" class="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded" required>
+                <label for="policy" class="ml-2 block text-sm text-gray-600">
+                  我已阅读并同意<a href="#" class="text-primary hover:underline">隐私政策</a>
+                </label>
+              </div>
+              
+              <div>
+                <button type="submit" class="w-full px-6 py-3 bg-primary hover:bg-primary/90 text-white font-medium rounded-lg shadow-md hover:shadow-lg transition-all transform hover:-translate-y-1">
+                  提交留言 <i class="fa fa-paper-plane ml-2"></i>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 地图 -->
+  <div class="h-96 bg-gray-200 relative">
+    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3429.192033375352!2d119.9245654150711!3d28.46237708246257!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3479f095f9c63b19%3A0xc339e18d9a0d1e24!2sLishui%20City%20People&#39;s%20Government!5e0!3m2!1sen!2sus!4v1687354420213!5m2!1sen!2sus" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+  </div>
+
+  <!-- 页脚 -->
+  <footer class="bg-dark text-white py-12">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div>
+          <div class="flex items-center mb-6">
+            <i class="fa fa-building-columns text-white text-2xl mr-2"></i>
+            <span class="text-xl font-bold">丽水市税务局</span>
+          </div>
+          <p class="text-gray-400 mb-6">
+            服务纳税人，促进地方发展。我们致力于提供高效、便捷的税务服务，贯彻落实国家税收政策。
+          </p>
+          <div class="flex space-x-4">
+            <a href="#" class="text-gray-400 hover:text-white transition-colors">
+              <i class="fa fa-weixin text-xl"></i>
+            </a>
+            <a href="#" class="text-gray-400 hover:text-white transition-colors">
+              <i class="fa fa-weibo text-xl"></i>
+            </a>
+            <a href="#" class="text-gray-400 hover:text-white transition-colors">
+              <i class="fa fa-youtube-play text-xl"></i>
+            </a>
+          </div>
+        </div>
+        
+        <div>
+          <h4 class="text-lg font-bold mb-6">快速链接</h4>
+          <ul class="space-y-3">
+            <li><a href="#home" class="text-gray-400 hover:text-white transition-colors">首页</a></li>
+            <li><a href="#services" class="text-gray-400 hover:text-white transition-colors">服务大厅</a></li>
+            <li><a href="#news" class="text-gray-400 hover:text-white transition-colors">政策法规</a></li>
+            <li><a href="#publicity" class="text-gray-400 hover:text-white transition-colors">税务宣传</a></li>
+            <li><a href="#contact" class="text-gray-400 hover:text-white transition-colors">联系我们</a></li>
+          </ul>
+        </div>
+        
+        <div>
+          <h4 class="text-lg font-bold mb-6">服务支持</h4>
+          <ul class="space-y-3">
+            <li><a href="#" class="text-gray-400 hover:text-white transition-colors">在线办税</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-white transition-colors">税收计算器</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-white transition-colors">发票查验</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-white transition-colors">纳税人学堂</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-white transition-colors">常见问题</a></li>
+          </ul>
+        </div>
+        
+        <div>
+          <h4 class="text-lg font-bold mb-6">订阅最新资讯</h4>
+          <p class="text-gray-400 mb-4">
+            订阅我们的电子通讯，及时获取最新税收政策和服务信息。
+          </p>
+          <form class="flex">
+            <input type="email" placeholder="您的邮箱地址" class="px-4 py-2 rounded-l-lg w-full focus:outline-none text-dark">
+            <button type="submit" class="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-r-lg transition-colors">
+              <i class="fa fa-envelope-o"></i>
+            </button>
+          </form>
+        </div>
+      </div>
+      
+      <div class="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
+        <p>© 2025 丽水市税务局 版权所有 | 浙ICP备12345678号</p>
+        <div class="mt-4 space-x-6">
+          <a href="#" class="text-gray-400 hover:text-white transition-colors">隐私政策</a>
+          <a href="#" class="text-gray-400 hover:text-white transition-colors">使用条款</a>
+          <a href="#" class="text-gray-400 hover:text-white transition-colors">网站地图</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- 返回顶部按钮 -->
+  <button id="back-to-top" class="fixed bottom-6 right-6 w-12 h-12 rounded-full bg-primary text-white shadow-lg flex items-center justify-center opacity-0 invisible transition-all duration-300 hover:bg-primary/90">
+    <i class="fa fa-arrow-up"></i>
+  </button>
+
+  <!-- JavaScript -->
+  <script>
+    // 导航栏滚动效果
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 50) {
+        navbar.classList.add('bg-white', 'shadow-md');
+        navbar.classList.remove('bg-white/90');
+      } else {
+        navbar.classList.remove('bg-white', 'shadow-md');
+        navbar.classList.add('bg-white/90');
+      }
+    });
+    
+    // 移动端菜单切换
+    const menuToggle = document.getElementById('menu-toggle');
+    const mobileMenu = document.getElementById('mobile-menu');
+    menuToggle.addEventListener('click', () => {
+      mobileMenu.classList.toggle('hidden');
+    });
+    
+    // 平滑滚动
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const targetId = this.getAttribute('href');
+        const targetElement = document.querySelector(targetId);
+        if (targetElement) {
+          window.scrollTo({
+            top: targetElement.offsetTop - 80,
+            behavior: 'smooth'
+          });
+          
+          // 如果是移动端，点击导航链接后关闭菜单
+          if (!mobileMenu.classList.contains('hidden')) {
+            mobileMenu.classList.add('hidden');
+          }
+        }
+      });
+    });
+    
+    // 返回顶部按钮
+    const backToTopButton = document.getElementById('back-to-top');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 300) {
+        backToTopButton.classList.remove('opacity-0', 'invisible');
+        backToTopButton.classList.add('opacity-100', 'visible');
+      } else {
+        backToTopButton.classList.add('opacity-0', 'invisible');
+        backToTopButton.classList.remove('opacity-100', 'visible');
+      }
+    });
+    
+    backToTopButton.addEventListener('click', () => {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    });
+    
+    // 数字计数动画
+    function animateCounter(elementId, targetValue, duration = 2000) {
+      const element = document.getElementById(elementId);
+      const startValue = 0;
+      const increment = targetValue / (duration / 16);
+      let currentValue = startValue;
+      
+      const timer = setInterval(() => {
+        currentValue += increment;
+        if (currentValue >= targetValue) {
+          clearInterval(timer);
+          currentValue = targetValue;
+        }
+        
+        // 根据元素ID设置不同的格式
+        if (elementId === 'counter-1' || elementId === 'counter-2' || elementId === 'counter-3') {
+          element.textContent = `${Math.floor(currentValue)}%`;
+        } else {
+          element.textContent = `${Math.floor(currentValue).toLocaleString()}`;
+        }
+      }, 16);
+    }
+    
+    // 检测元素是否在视口中
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          // 启动计数器动画
+          animateCounter('counter-1', 98);
+          animateCounter('counter-2', 95);
+          animateCounter('counter-3', 92);
+          animateCounter('counter-4', 1200000);
+          
+          // 只观察一次
+          observer.disconnect();
+        }
+      });
+    }, { threshold: 0.5 });
+    
+    // 观察统计区域
+    const statsSection = document.querySelector('.gradient-bg.text-white');
+    if (statsSection) {
+      observer.observe(statsSection);
+    }
+    
+    // 表单提交
+    const contactForm = document.getElementById('contact-form');
+    if (contactForm) {
+      contactForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        
+        // 这里可以添加表单验证和提交逻辑
+        alert('留言提交成功！我们将尽快回复您。');
+        contactForm.reset();
+      });
+    }
+  </script>
+</body>
+</html>
